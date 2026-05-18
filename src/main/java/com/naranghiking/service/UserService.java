@@ -1,6 +1,7 @@
 package com.naranghiking.service;
 
 import com.naranghiking.model.dto.LoginRequest;
+import com.naranghiking.model.dto.SignUpRequest;
 import com.naranghiking.model.dto.User;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpSession;
@@ -32,5 +33,12 @@ public class UserService {
         }
         session.setAttribute("loginUser", user);
         return ResponseEntity.ok("login ok");
+    }
+
+    public User register(SignUpRequest request) {
+        if (users.containsKey(request.getEmail())) {
+            throw new RuntimeException("이미 존재하는 이메일입니다.");
+        }
+        return users.put(request.getEmail(), new User(request.getEmail(), request.getPassword(), request.getName()));
     }
 }

@@ -1,6 +1,7 @@
 package com.naranghiking.controller;
 
 import com.naranghiking.model.dto.LoginRequest;
+import com.naranghiking.model.dto.SignUpRequest;
 import com.naranghiking.service.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpSession;
@@ -28,5 +29,21 @@ public class AuthController {
     @PostMapping("/login")
     ResponseEntity<String> login(@RequestBody LoginRequest request, HttpSession session) {
         return service.login(request, session);
+    }
+
+    @PostMapping("/logout")
+    ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();;
+        return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/register")
+    ResponseEntity<String> register(@RequestBody SignUpRequest request) {
+        try {
+            service.register(request);
+            return ResponseEntity.ok("signup ok");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("bad request");
+        }
     }
 }
