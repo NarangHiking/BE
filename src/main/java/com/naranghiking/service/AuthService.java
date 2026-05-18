@@ -27,25 +27,24 @@ public class AuthService {
     @PostConstruct
     void init() {
         //테스트 데이터 생성
-        users.put("test@test.com", new User("test@test.com", "1234", "woochan"));
+        users.put("test@test.com", new User("test@test.com", passwordEncoder.encode("1234"), "woochan"));
     }
 
-    public ResponseEntity<String> login(@RequestBody LoginRequest request, HttpSession session) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         User user = users.get(request.getEmail());
         if (user == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("login fail");
-        String password = user.getPassword();
-        if (password == null || !password.equals(request.getPassword())) {
+        String encodedPassword = user.getPassword();
+
+        if (encodedPassword == null || !passwordEncoder.matches(request.getPassword(), encodedPassword))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("login fail");
-        }
-        session.setAttribute("loginUser", user);
         return ResponseEntity.ok("login ok");
     }
 
-    public User register(SignUpRequest request) {
+    public void register(SignUpRequest request) {
         if (users.containsKey(request.getEmail())) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
-        return users.put(request.getEmail(), new User(request.getEmail(), request.getPassword(), request.getName()));
+        users.put(request.getEmail(), new User(request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getName()));
     }
 }

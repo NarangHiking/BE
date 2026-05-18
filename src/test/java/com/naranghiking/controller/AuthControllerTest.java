@@ -27,15 +27,12 @@ class AuthControllerTest {
 
     @Test
     void login_ok() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"test@test.com\", \"password\":\"1234\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("login ok"))
                 .andReturn();
-        User loginUser = (User) result.getRequest().getSession().getAttribute("loginUser");
-        assertNotNull(loginUser);
-        assertEquals("test@test.com", loginUser.getEmail());
      }
 
 

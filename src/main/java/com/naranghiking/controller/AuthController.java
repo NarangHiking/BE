@@ -27,8 +27,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<String> login(@RequestBody LoginRequest request, HttpSession session) {
-        return service.login(request, session);
+    ResponseEntity<String> login(@RequestBody LoginRequest request) {
+        return service.login(request);
     }
 
     @PostMapping("/logout")
