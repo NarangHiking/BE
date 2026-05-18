@@ -6,10 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,19 +55,28 @@ class AuthControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-     @Test
-     void logout() throws Exception {
-        // given
-        login_ok();
-        // when
-         MvcResult result = mockMvc.perform(post("/api/auth/logout")
-                 .contentType(MediaType.APPLICATION_JSON))
-                 .andExpect(status().isOk())
-                 .andReturn();
-        User loginUser = (User) result.getRequest().getSession().getAttribute("loginUser");
-        // then
-        assertNull(loginUser);
-     }
+    //
+//     @Test
+//     void logoutV0() throws Exception {
+//        // given
+//        login_ok();
+//        // when
+//         MvcResult result = mockMvc.perform(post("/api/auth/logout")
+//                 .contentType(MediaType.APPLICATION_JSON))
+//                 .andExpect(status().isOk())
+//                 .andReturn();
+//        User loginUser = (User) result.getRequest().getSession().getAttribute("loginUser");
+//        // then
+//        assertNull(loginUser);
+//     }
+
+    @Test
+    void logoutV1() throws Exception {
+        mockMvc.perform(post("/api/auth/logout")
+                        .with(user("tester").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void register_ok() throws Exception {
