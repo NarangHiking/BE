@@ -1,11 +1,10 @@
-package com.naranghiking.auth;
+package com.naranghiking.auth.controller;
 
+import com.naranghiking.auth.service.AuthService;
 import com.naranghiking.auth.dto.LoginRequest;
-import com.naranghiking.user.dto.SignUpRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,12 +23,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return service.login(request);
     }
 
     @PostMapping("/logout")
-    ResponseEntity<String> logout(HttpServletRequest request) {
+    ResponseEntity<?> logout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null)
             session.invalidate();
