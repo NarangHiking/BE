@@ -4,7 +4,6 @@
 ### 2026-05-20
 - [x] 패키지 구조 분리 (auth / user)
 - [x] AuthService에서 register 분리 → UserService로 이동
-- [x] UserController @RestController 누락 수정
 - [ ] UserDao 연결 (DB 미연결)
 
 ### 2026-05-19
