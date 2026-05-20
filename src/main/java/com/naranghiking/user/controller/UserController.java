@@ -1,5 +1,6 @@
-package com.naranghiking.user;
+package com.naranghiking.user.controller;
 
+import com.naranghiking.user.service.UserService;
 import com.naranghiking.user.dto.SignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
