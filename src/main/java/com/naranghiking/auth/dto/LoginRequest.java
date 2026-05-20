@@ -1,4 +1,4 @@
-package com.naranghiking.model.dto;
+package com.naranghiking.auth.dto;
 
 import lombok.Getter;
 

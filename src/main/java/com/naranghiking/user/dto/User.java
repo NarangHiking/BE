@@ -1,7 +1,6 @@
-package com.naranghiking.model.dto;
+package com.naranghiking.user.dto;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
