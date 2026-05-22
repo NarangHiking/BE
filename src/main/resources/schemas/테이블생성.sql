@@ -1,0 +1,24 @@
+use NarangHiking;
+
+CREATE TABLE IF NOT EXISTS users (
+	id BIGINT AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS tracks (
+	id BIGINT AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS boards (
+			id BIGINT AUTO_INCREMENT PRIMARY KEY,
+       user_id BIGINT NOT NULL,
+      track_id BIGINT DEFAULT NULL,
+		 title VARCHAR(20) NOT NULL,
+       content TEXT NOT NULL,
+      category ENUM('free', 'feedback') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT NULL,
+    deleted_at TIMESTAMP DEFAULT NULL,
+	
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (track_id) REFERENCES tracks(id)
+);
