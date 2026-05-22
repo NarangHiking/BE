@@ -17,7 +17,7 @@ public class BoardResponse {
     private long userId;
 
     @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1")
-    private long tackId;
+    private long trackId;
 
     @Schema(description = "게시글의 제목", example = "오늘의 등산 코스")
     private String title;
