@@ -1,6 +1,7 @@
 package com.naranghiking.user.controller;
 
 import com.naranghiking.user.service.UserService;
+import com.naranghiking.common.dto.ApiResult;
 import com.naranghiking.user.dto.SignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,12 +17,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    ResponseEntity<String> register(@RequestBody SignUpRequest request) {
+    ResponseEntity<ApiResult> register(@RequestBody SignUpRequest request) {
         try {
             userService.register(request);
-            return ResponseEntity.ok("signup ok");
+            return ResponseEntity.ok(ApiResult.success("signup ok"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("bad request");
+        	return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResult.fail("bad request"));
         }
     }
 }

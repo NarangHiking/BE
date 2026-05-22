@@ -12,8 +12,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import com.naranghiking.auth.dto.LoginRequest;
+import com.naranghiking.auth.dto.TokenResponse;
+import com.naranghiking.common.dto.ApiResult;
 import com.naranghiking.common.util.JwtUtil;
 import com.naranghiking.user.dto.User;
 import com.naranghiking.user.service.UserService;
@@ -40,7 +43,7 @@ class AuthServiceTest {
 	void login_success() {
 		//given
 		LoginRequest request = new LoginRequest("test","test@test.com", "password");
-		User user = new User(1L, "test", "test@test.com", "password");
+		User user = new User("1", "test", "test@test.com", "password");
 		
 		when(userService.findByEmail("test@test.com")).thenReturn(user);
 		when(userService.checkPassword("password", user.getPassword())).thenReturn(true);
@@ -48,10 +51,12 @@ class AuthServiceTest {
 		when(jwtUtil.generateRefreshToken("1")).thenReturn("refreshToken");
 		
 		// when
-		ResponseEntity<?> response = authService.login(request);
+		TokenResponse response = authService.login(request);
 		
 		//then
-		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals("accessToken", response.getAccessToken());
+        assertEquals("refreshToken", response.getRefreshToken());
+        assertEquals("1", response.getUserId());
 		verify(tokenService).saveRefreshToken("1", "refreshToken");
 	}
 	
@@ -62,25 +67,19 @@ class AuthServiceTest {
 		when(userService.findByEmail("test@test.com")).thenReturn(null);
 		
 		//when
-		ResponseEntity<?> response = authService.login(request);
-		
-		//then
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertThrows(IllegalArgumentException.class, () -> authService.login(request));
 	}
 	
 	@Test
 	void login_wrongPassword() {
 		//given
 		LoginRequest request = new LoginRequest("test", "test@test.com", "password");
-		User user = new User(1L, "test", "test@test.com", "password");
+		User user = new User("1", "test", "test@test.com", "password");
 		when(userService.findByEmail("test@test.com")).thenReturn(user);
 		when(userService.checkPassword(any(), any())).thenReturn(false);
 		
 		// when
-		ResponseEntity<?> response = authService.login(request);
-		
-		// then
-		assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+		assertThrows(BadCredentialsException.class, () -> authService.login(request));
 	}
 	
 	@Test
@@ -93,19 +92,23 @@ class AuthServiceTest {
 	
 	@Test
 	void reissue_success() {
+		
+		when(jwtUtil.isExpired("refreshToken")).thenReturn(false);
+	    when(jwtUtil.getUserId("refreshToken")).thenReturn("1");
 		when(tokenService.getRefreshToken("1")).thenReturn("refreshToken");
 		when(jwtUtil.generateAccessToken("1")).thenReturn("newAccessToken");
 		
-		String result = authService.reissue("1", "refreshToken");
-		
-		assertEquals("newAccessToken", result);
+		TokenResponse result = authService.reissue("refreshToken");
+		assertEquals("newAccessToken", result.getAccessToken());
 	}
 	
     @Test
     void reissue_fail() {
+    	when(jwtUtil.isExpired("refreshToken")).thenReturn(false);
+    	when(jwtUtil.getUserId("refreshToken")).thenReturn("1");
         when(tokenService.getRefreshToken("1")).thenReturn("differentToken");
 
         assertThrows(RuntimeException.class,
-                () -> authService.reissue("1", "refreshToken"));
+                () -> authService.reissue("refreshToken"));
     }
 }
