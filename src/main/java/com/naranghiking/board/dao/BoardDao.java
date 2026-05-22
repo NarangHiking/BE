@@ -9,4 +9,6 @@ import java.util.List;
 public interface BoardDao {
     // 전체 게시글 조회
     List<BoardResponse> selectAll();
+    // 게시글 단건 조회
+    BoardResponse selectById(long id);
 }

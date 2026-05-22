@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Schema(description = "게시글 조회에 필요한 DTO")
 @Getter
@@ -13,6 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardResponse {
+    @Schema(description = "게시글의 ID, 해당 게시글을 선택할 때 필요", example = "1")
+    private long id;
+
     @Schema(description = "사용자 ID, 반드시 필요", example = "1")
     private long userId;
 

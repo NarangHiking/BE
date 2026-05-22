@@ -5,13 +5,20 @@
 <mapper namespace="com.naranghiking.board.dao.BoardDao">
 
     <resultMap id="boardResponseMap" type="BoardResponse">
+        <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="track_id" property="trackId"/>
         <result column="created_at" property="createdAt"/>
     </resultMap>
-
+<!-- 게시글 전체 조회 -->
     <select id="selectAll" resultMap="boardResponseMap">
-        SELECT user_id, track_id, title, content, category, created_at
+        SELECT id, user_id, track_id, title, content, category, created_at
           FROM boards
+    </select>
+<!-- 게시글 단건 조회 -->
+    <select id="selectById" resultMap="boardResponseMap">
+        SELECT id, user_id, track_id, title, content, category, created_at
+          FROM boards
+         WHERE id = #{id}
     </select>
 </mapper>

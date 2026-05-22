@@ -17,4 +17,9 @@ public class BoardServiceImpl implements BoardService {
     public List<BoardResponse> selectAll() {
         return boardDao.selectAll();
     }
+
+    @Override
+    public BoardResponse selectById(long id) {
+        return boardDao.selectById(id);
+    }
 }
