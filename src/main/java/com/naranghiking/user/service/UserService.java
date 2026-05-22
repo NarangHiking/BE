@@ -20,7 +20,7 @@ public class UserService {
     @PostConstruct
     void init() {
         //테스트 데이터 생성
-        users.put("test@test.com", new User(1,"test@test.com", passwordEncoder.encode("1234"), "woochan"));
+        users.put("test@test.com", new User("1","test@test.com", passwordEncoder.encode("1234"), "woochan"));
     }
 
     public void register(SignUpRequest request) {
