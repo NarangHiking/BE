@@ -7,23 +7,18 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "게시글 조회에 필요한 DTO")
+@Schema(description = "게시글 작성에 필요한 DTO")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardResponse {
-    @Schema(description = "게시글의 ID, 해당 게시글을 선택할 때 필요", example = "1")
-    @NotNull
-    private Long id;
-
+public class BoardRequest {
     @Schema(description = "사용자 ID, 반드시 필요", example = "1")
     @NotNull
     private Long userId;
 
     @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1")
-    @NotNull
     private Long trackId;
 
     @Schema(description = "게시글의 제목", example = "오늘의 등산 코스")
@@ -37,7 +32,4 @@ public class BoardResponse {
     @Schema(description = "게시글의 카테고리, 자유 또는 건의사항", example = "free, feedback")
     @NotBlank
     private String category;
-
-    @Schema(description = "게시글 생성일", example = "2025-05-21")
-    private LocalDateTime createdAt;
 }
