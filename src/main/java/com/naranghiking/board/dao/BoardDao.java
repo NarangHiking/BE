@@ -1,5 +1,6 @@
 package com.naranghiking.board.dao;
 
+import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.board.dto.BoardResponse;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -11,4 +12,6 @@ public interface BoardDao {
     List<BoardResponse> selectAll();
     // 게시글 단건 조회
     BoardResponse selectById(long id);
+    // 게시글 생성
+    int insert(BoardRequest board);
 }

@@ -10,15 +10,20 @@
         <result column="track_id" property="trackId"/>
         <result column="created_at" property="createdAt"/>
     </resultMap>
-<!-- 게시글 전체 조회 -->
+<!--  게시글 전체 조회  -->
     <select id="selectAll" resultMap="boardResponseMap">
         SELECT id, user_id, track_id, title, content, category, created_at
           FROM boards
     </select>
-<!-- 게시글 단건 조회 -->
+<!--  게시글 단건 조회  -->
     <select id="selectById" resultMap="boardResponseMap">
         SELECT id, user_id, track_id, title, content, category, created_at
           FROM boards
          WHERE id = #{id}
     </select>
+<!--  게시글 생성  -->
+    <insert id="insert" parameterType="boardRequest">
+        INSERT INTO boards(user_id, track_id, title, content, category)
+        VALUES (#{userId}, #{trackId, jdbcType=BIGINT}, #{title}, #{content}, #{category})
+    </insert>
 </mapper>

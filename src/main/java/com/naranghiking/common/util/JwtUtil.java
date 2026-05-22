@@ -13,14 +13,14 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-//    @Value("${jwt.secret}")
-    private String secretKey = "qwertyuiop1234567890"; // 임시 값
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-//    @Value("${jwt.access-expiration}")
-    private long accessExpiration = 3600000;
+    @Value("${jwt.access-expiration}")
+    private long accessExpiration;
 
-//    @Value("${jwt.refresh-expiration}")
-    private long refreshExpiration = 3600000;
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpiration;
 
     // 서명 키 생성
     private SecretKey getSignKey() {
