@@ -26,7 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		String token = resolveToken(request);
 		
 		// 토큰이 없는 경우 다음 필터로 => 토큰이 없는 경우는 오류가 아니며 발급이 안된 상태를 의미함.

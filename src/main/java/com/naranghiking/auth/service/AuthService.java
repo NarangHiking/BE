@@ -18,7 +18,7 @@ public class AuthService {
 
     private final UserService userService;
     private final TokenService tokenService;
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         User user = userService.findByEmail(request.getEmail());
@@ -28,7 +28,7 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("login fail");
 
         String accessToken =jwtUtil.generateAccessToken(String.valueOf(user.getUserId()));
-        String refreshToken =jwtUtil.generateAccessToken(String.valueOf(user.getUserId()));
+        String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getUserId()));
         tokenService.saveRefreshToken(String.valueOf(user.getUserId()), refreshToken);
 
         return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken",refreshToken));
