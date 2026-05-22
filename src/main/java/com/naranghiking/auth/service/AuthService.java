@@ -35,7 +35,7 @@ public class AuthService {
     }
 
     public void logout(String userId, String accessToken) {
-        tokenService.blackListAccessToken(accessToken);
+        tokenService.blacklistAccessToken(accessToken);
         tokenService.deleteRefreshToken(userId);
     }
 

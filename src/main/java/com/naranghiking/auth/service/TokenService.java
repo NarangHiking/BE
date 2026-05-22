@@ -28,7 +28,7 @@ public class TokenService {
         redisTemplate.delete("RT:"+userId);
     }
 
-    public void blackListAccessToken(String accessToken) {
+    public void blacklistAccessToken(String accessToken) {
         long expiration = jwtUtil.getRemainExpiration(accessToken);
         redisTemplate.opsForValue()
                 .set("BL:"+accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
