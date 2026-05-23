@@ -15,12 +15,16 @@ public class BoardServiceImpl implements BoardService {
     private final BoardDao boardDao;
 
     @Override
-    public List<BoardResponse> selectAll() {
-        return boardDao.selectAll();
+    public List<BoardResponse> selectAll(String keyword, String category) {
+        // 키워드 또는 카테고리가 비어있을 때, 전부 null로 치환(동적 SQL로직에서 유리)
+        if(keyword == null || keyword.trim().isEmpty()) keyword = null;
+        if(category == null || category.trim().isEmpty()) category = null;
+
+        return boardDao.selectAll(keyword, category);
     }
 
     @Override
-    public BoardResponse selectById(long id) {
+    public BoardResponse selectById(Long id) {
         return boardDao.selectById(id);
     }
 
