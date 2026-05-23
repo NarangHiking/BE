@@ -10,7 +10,7 @@ public class ApiResult<T> {
 	@Schema(description = "성공 여부", example="true")
 	private boolean success;
 	
-	@Schema(description = "실패 시 에러 메시지 (공 시 null)", example = "null")
+	@Schema(description = "실패 시 에러 메시지 (성공 시 null)", example = "null")
 	private String error;
 	
 	@Schema(description = "성공 시 반환할 객체 (실패 시 null)")

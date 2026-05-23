@@ -13,4 +13,6 @@ public interface BoardService {
     BoardResponse selectById(Long id);
     // 게시글 생성
     int insert(BoardRequest board);
+    // 게시글 수정
+    int update(Long id, BoardRequest board);
 }
