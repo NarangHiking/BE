@@ -32,4 +32,9 @@ public class BoardServiceImpl implements BoardService {
     public int insert(BoardRequest board) {
         return boardDao.insert(board);
     }
+
+    @Override
+    public int update(Long id, BoardRequest board) {
+        return boardDao.update(id, board);
+    }
 }

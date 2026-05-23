@@ -36,4 +36,13 @@
         INSERT INTO boards(user_id, track_id, title, content, category)
         VALUES (#{userId}, #{trackId, jdbcType=BIGINT}, #{title}, #{content}, #{category})
     </insert>
+<!--  게시글 수정  -->
+    <update id="update">
+        UPDATE boards
+           SET title = #{board.title},
+               content = #{board.content},
+               category = #{board.category},
+               updated_at = DEFAULT
+        WHERE id = #{id}
+    </update>
 </mapper>
