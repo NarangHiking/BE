@@ -12,7 +12,9 @@ public interface BoardService {
     // 게시글 단건 조회
     BoardResponse selectById(Long id);
     // 게시글 생성
-    int insert(BoardRequest board);
+    void insert(BoardRequest board);
     // 게시글 수정
-    int update(Long id, BoardRequest board);
+    BoardResponse update(Long id, BoardRequest board);
+    // 게시글 삭제
+    void deleteById(Long id);
 }

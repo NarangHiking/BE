@@ -45,4 +45,9 @@
                updated_at = DEFAULT
         WHERE id = #{id}
     </update>
+<!--  게시글 삭제  -->
+    <delete id="deleteById">
+        DELETE FROM boards
+         WHERE id = #{id}
+    </delete>
 </mapper>
