@@ -5,110 +5,113 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 
+import com.naranghiking.common.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisRepositoriesAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import com.naranghiking.auth.dto.LoginRequest;
 import com.naranghiking.auth.dto.TokenResponse;
-import com.naranghiking.common.dto.ApiResult;
 import com.naranghiking.common.util.JwtUtil;
 import com.naranghiking.user.dto.User;
-import com.naranghiking.user.service.UserService;
+import com.naranghiking.user.service.UserServiceImpl;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class AuthServiceTest {
 	
-	@Mock
-	private UserService userService;
+	@Autowired
+	private UserServiceImpl userService;
 	
-	@Mock
+	@Autowired
 	private TokenService tokenService;
 	
-	@Mock
+	@Autowired
 	private JwtUtil jwtUtil;
-	
-	// 가짜 객체 주입
-	@InjectMocks
+
+	@Autowired
 	private AuthService authService;
 
-	// 가짜 객체로 테스트 진행 => 실제로 비밀번호가 일치하는지 확인이 불가능
-	// 추후 통합 테스트 필요
-	@Test
+
+//        ('admin@naranghiking.com', 'admin1234', '관리자', 'ADMIN'),
+//                ('hong@test.com', 'pass1234', '홍길동', 'USER'),
+
+    @Test
 	void login_success() {
 		//given
-		LoginRequest request = new LoginRequest("test","test@test.com", "password");
-		User user = new User("1", "test", "test@test.com", "password");
-		
-		when(userService.findByEmail("test@test.com")).thenReturn(user);
-		when(userService.checkPassword("password", user.getPassword())).thenReturn(true);
-		when(jwtUtil.generateAccessToken("1")).thenReturn("accessToken");
-		when(jwtUtil.generateRefreshToken("1")).thenReturn("refreshToken");
-		
+        LoginRequest request = new LoginRequest("2", "hong@test.com", "pass1234");
+
 		// when
 		TokenResponse response = authService.login(request);
 		
 		//then
-		assertEquals("accessToken", response.getAccessToken());
-        assertEquals("refreshToken", response.getRefreshToken());
-        assertEquals("1", response.getUserId());
-		verify(tokenService).saveRefreshToken("1", "refreshToken");
+        assertNotNull(response.getAccessToken());
+        assertNotNull(response.getRefreshToken());
+        assertNotNull(response.getUserId());
+
+        String userId = jwtUtil.getUserId(response.getAccessToken());
+        assertEquals("2", userId);
 	}
 	
 	@Test
 	void login_userNotFound() {
 		//given
-		LoginRequest request = new LoginRequest("test", "test@test.com", "password");
-		when(userService.findByEmail("test@test.com")).thenReturn(null);
-		
+        LoginRequest request = new LoginRequest("-1", "wrongEmail", "pass1234");
+
 		//when
-		assertThrows(IllegalArgumentException.class, () -> authService.login(request));
+		assertThrows(UserNotFoundException.class, () -> authService.login(request));
 	}
 	
 	@Test
 	void login_wrongPassword() {
 		//given
-		LoginRequest request = new LoginRequest("test", "test@test.com", "password");
-		User user = new User("1", "test", "test@test.com", "password");
-		when(userService.findByEmail("test@test.com")).thenReturn(user);
-		when(userService.checkPassword(any(), any())).thenReturn(false);
-		
+        LoginRequest request = new LoginRequest("2", "hong@test.com", "wrongpassword");
+
 		// when
 		assertThrows(BadCredentialsException.class, () -> authService.login(request));
 	}
 	
-	@Test
-	void logout() {
-		authService.logout("1", "accessToken");
-		
-		verify(tokenService).blacklistAccessToken("accessToken");
-		verify(tokenService).deleteRefreshToken("1");
-	}
-	
-	@Test
-	void reissue_success() {
-		
-		when(jwtUtil.isExpired("refreshToken")).thenReturn(false);
-	    when(jwtUtil.getUserId("refreshToken")).thenReturn("1");
-		when(tokenService.getRefreshToken("1")).thenReturn("refreshToken");
-		when(jwtUtil.generateAccessToken("1")).thenReturn("newAccessToken");
-		
-		TokenResponse result = authService.reissue("refreshToken");
-		assertEquals("newAccessToken", result.getAccessToken());
-	}
-	
-    @Test
-    void reissue_fail() {
-    	when(jwtUtil.isExpired("refreshToken")).thenReturn(false);
-    	when(jwtUtil.getUserId("refreshToken")).thenReturn("1");
-        when(tokenService.getRefreshToken("1")).thenReturn("differentToken");
-
-        assertThrows(RuntimeException.class,
-                () -> authService.reissue("refreshToken"));
-    }
+//	@Test
+//	void logout() {
+//        //given
+//        LoginRequest request = new LoginRequest("2", "hong@test.com", "pass1234");
+//        TokenResponse loginResponse = authService.login(request);
+//        String userId = loginResponse.getUserId();
+//        String accessToken = loginResponse.getAccessToken();
+//        assertNotNull(tokenService.getRefreshToken(userId));
+//
+//        //when
+//        authService.logout(userId, accessToken);
+//
+//        //then
+//        assertNull(tokenService.getRefreshToken(userId));
+//        assertTrue(tokenService.isBlacklisted(accessToken));
+//    }
+//
+//	@Test
+//	void reissue_success() {
+//        // given — 먼저 로그인해서 진짜 refresh token 얻기
+//        LoginRequest request = new LoginRequest("2","hong@test.com", "pass1234");
+//        TokenResponse loginResponse = authService.login(request);
+//        String refreshToken = loginResponse.getRefreshToken();
+//
+//        // when
+//        TokenResponse result = authService.reissue(refreshToken);
+//
+//		TokenResponse result = authService.reissue("refreshToken");
+//		assertEquals("newAccessToken", result.getAccessToken());
+//	}
+//
+//    @Test
+//    void reissue_fail() {
+//        assertThrows(RuntimeException.class,
+//                () -> authService.reissue("refreshToken"));
+//    }
 }

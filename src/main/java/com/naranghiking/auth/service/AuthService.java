@@ -7,37 +7,33 @@ import com.naranghiking.common.exception.TokenExpiredException;
 import com.naranghiking.common.exception.UserNotFoundException;
 import com.naranghiking.common.util.JwtUtil;
 import com.naranghiking.user.service.UserService;
+import com.naranghiking.user.service.UserServiceImpl;
 import com.naranghiking.user.dto.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserService userService;
+    private final UserService userServiceImpl;
     private final TokenService tokenService;
     private final JwtUtil jwtUtil;
 
     public TokenResponse login(LoginRequest request) {
-        User user = userService.findByEmail(request.getEmail());
+        User user = userServiceImpl.select(request.getEmail());
         
         if (user == null)
             throw new UserNotFoundException("사용자를 찾을 수 없습니다");
-        if (!userService.checkPassword(request.getPassword(), user.getPassword()))
+        if (!userServiceImpl.checkPassword(request.getPassword(), user.getPass()))
         	throw new BadCredentialsException("401_UNAUTHORIZED");
 
-        String accessToken =jwtUtil.generateAccessToken(String.valueOf(user.getUserId()));
-        String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getUserId()));
-        tokenService.saveRefreshToken(String.valueOf(user.getUserId()), refreshToken);
+        String accessToken =jwtUtil.generateAccessToken(String.valueOf(user.getId()));
+        String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getId()));
+        tokenService.saveRefreshToken(String.valueOf(user.getId()), refreshToken);
         
-        return new TokenResponse(accessToken, refreshToken, user.getUserId());
+        return new TokenResponse(accessToken, refreshToken, user.getId().toString());
     }
 
     public void logout(String userId, String accessToken) {
