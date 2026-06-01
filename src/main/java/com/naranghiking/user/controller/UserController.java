@@ -1,5 +1,6 @@
 package com.naranghiking.user.controller;
 
+import com.naranghiking.auth.service.AuthService;
 import com.naranghiking.user.dto.UpdateRequest;
 import com.naranghiking.user.dto.User;
 import com.naranghiking.user.dto.UserResponse;
@@ -21,6 +22,7 @@ import java.util.List;
 public class UserController {
 
     private final UserServiceImpl userService;
+    private final AuthService authService;
 
     @GetMapping("/list")
     ResponseEntity<ApiResult> selectAll() {
@@ -31,7 +33,7 @@ public class UserController {
     @GetMapping
     ResponseEntity<ApiResult> select(
             @AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(ApiResult.success(userService.select(userId)));
+        return ResponseEntity.ok(ApiResult.success(userService.selectById(userId)));
     }
 
     @PostMapping
@@ -49,6 +51,15 @@ public class UserController {
             @AuthenticationPrincipal String userId,
             @RequestBody UpdateRequest request){
         userService.update(userId, request);
+        return ResponseEntity.ok(ApiResult.success(null));
+    }
+
+    @PatchMapping("/remove")
+    ResponseEntity<ApiResult> remove(
+            @AuthenticationPrincipal String userId,
+            @RequestHeader("Authorization") String bearer
+    ){
+
         return ResponseEntity.ok(ApiResult.success(null));
     }
 }

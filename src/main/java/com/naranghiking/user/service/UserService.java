@@ -14,4 +14,6 @@ public interface UserService {
     UserResponse selectById(String userId);
     public List<UserResponse> selectAll();
     public boolean checkPassword(String rawPassword, String encodedPassword);
+
+    void delete(String userId);
 }

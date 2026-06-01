@@ -35,9 +35,10 @@
         where id = #{userId}
     </update>
 
-    <delete id="delete">
-        delete from users
-        where id = #{id}
-    </delete>
+    <update id="delete">
+        update users
+        set delete_at = CURRENT_TIMESTAMP
+        where id = #{userId}
+    </update>
 
 </mapper>

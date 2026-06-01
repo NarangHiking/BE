@@ -23,5 +23,5 @@ public interface UserDao {
 
     int update(UpdateRequest request);
 
-    void delete(int id);
+    void delete(String userId);
 }

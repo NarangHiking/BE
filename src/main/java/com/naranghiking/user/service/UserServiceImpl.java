@@ -43,13 +43,9 @@ public class UserServiceImpl implements UserService {
         return userDao.findById(userId);
     }
 
-    // 사용자 전달용
+    // 사용자 전달용, 관리자만
     @Override
     public UserResponse selectById(String userId) {
-        return null;
-    }
-
-    public UserResponse select(String userId) {
         return userDao.select(userId).toResponse();
     }
 
@@ -76,5 +72,14 @@ public class UserServiceImpl implements UserService {
 
     public boolean checkPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    @Override
+    public void delete(String userId) {
+        User user = userDao.select(userId);
+        if (user == null) {
+            throw new UserNotFoundException("해당 사용자가 존재하지 않습니다.");
+        }
+        userDao.delete(userId);
     }
 }
