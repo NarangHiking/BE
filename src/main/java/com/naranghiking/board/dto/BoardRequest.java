@@ -12,6 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardRequest {
+    @Schema(description = "게시글의 ID, 게시글 작성 시 자동으로 생성", example = "1")
+    private Long id;
+
     @Schema(description = "사용자 ID, 반드시 필요", example = "1")
     @NotNull
     private Long userId;

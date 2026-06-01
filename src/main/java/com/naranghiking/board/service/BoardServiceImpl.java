@@ -5,9 +5,12 @@ import com.naranghiking.board.dto.BoardDetailResponse;
 import com.naranghiking.board.dto.BoardListResponse;
 import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.board.dto.BoardResponse;
+import com.naranghiking.common.dto.ImageRequest;
+import com.naranghiking.common.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +20,7 @@ import java.util.NoSuchElementException;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardDao boardDao;
+    private final FileService fileService;
 
     @Override
     public List<BoardListResponse> selectAll(String keyword, String category) {
@@ -37,9 +41,17 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional // 실패하면 롤백
     @Override
-    public void insert(BoardRequest board) {
+    public void insert(BoardRequest board, List<MultipartFile> images) {
         int result = boardDao.insert(board);
         if(result == 0) throw new RuntimeException("게시글 저장에 실패했습니다.");
+
+        if(images != null && !images.isEmpty()) {
+            List<ImageRequest> newImages = fileService.saveFiles(images, "board");
+
+            if(!newImages.isEmpty()) { // 성공적으로 값이 전달되면 DB에 저장
+                boardDao.insertImages(board.getId(), newImages);
+            }
+        }
     }
 
     @Transactional // 실패하면 롤백

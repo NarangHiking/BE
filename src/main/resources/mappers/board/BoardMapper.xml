@@ -60,9 +60,17 @@
          WHERE board_id = #{id}
     </select>
 <!--  게시글 생성  -->
-    <insert id="insert" parameterType="boardRequest">
+    <insert id="insert" parameterType="boardRequest" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO boards(user_id, track_id, title, content, category)
         VALUES (#{userId}, #{trackId, jdbcType=BIGINT}, #{title}, #{content}, #{category})
+    </insert>
+    <!--  게시글 생성 시 이미지 저장  -->
+    <insert id="insertImages">
+        INSERT INTO board_images(board_id, original_filename, stored_filename)
+        VALUES
+            <foreach collection="images" item="image" separator=",">
+                (#{id}, #{image.originalFilename}, #{image.storedFilename})
+            </foreach>
     </insert>
 <!--  게시글 수정  -->
     <update id="update">
