@@ -4,29 +4,23 @@
 
 <mapper namespace="com.naranghiking.board.dao.BoardDao">
 
-    <resultMap id="boardResponseMap" type="BoardResponse">
-        <id column="id" property="id"/>
-        <result column="user_id" property="userId"/>
-        <result column="track_id" property="trackId"/>
-        <result column="created_at" property="createdAt"/>
-    </resultMap>
 <!--  게시글 전체 조회  -->
-    <select id="selectAll" resultMap="boardResponseMap">
-        SELECT id, user_id, track_id, title, content, category, created_at
-          FROM boards
-        <where>
-            <if test="keyword != null"> <!--키워드로 탐색-->
-                (title LIKE CONCAT('%', #{keyword}, '%')) OR
-                (content LIKE CONCAT('%', #{keyword}, '%'))
-            </if>
-            <if test="category != null"> <!--카테고리로 탐색-->
-                AND (category = #{category})
-            </if>
-        </where>
-        ORDER BY created_at DESC
+    <select id="selectAll" resultType="BoardListResponse">
+        SELECT b.id, u.name, b.title, b.category, b.created_at,
+               -- 댓글 수
+               (SELECT count(*)
+                  FROM board_comments bc
+                 WHERE bc.board_id = b.id) AS commentCount,
+               -- 저장된 이미지
+               (SELECT stored_filename
+                  FROM board_images bi
+                 WHERE bi.board_id = b.id
+                 LIMIT 1) AS image
+          FROM boards b join users u on b.user_id = u.id
+         ORDER BY b.id DESC
     </select>
 <!--  게시글 단건 조회  -->
-    <select id="selectById" resultMap="boardResponseMap">
+    <select id="selectById" resultType="boardResponse">
         SELECT id, user_id, track_id, title, content, category, created_at
           FROM boards
          WHERE id = #{id}
