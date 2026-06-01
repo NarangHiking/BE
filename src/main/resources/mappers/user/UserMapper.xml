@@ -4,27 +4,35 @@
 
 <mapper namespace="com.naranghiking.user.dao.UserDao">
 
-    <select id="selectAll">
-        select * from users;
-    </select>
-
-    <select id="select">
+    <select id="findByEmail">
         select * from users
         where email = #{email};
     </select>
 
+    <select id="findById">
+        select * from users
+        where id = #{userId};
+    </select>
+
+    <select id="select">
+        select email, name, role, create_at from users
+        where id = #{userId}
+    </select>
+
+    <select id="selectAll">
+        select email, name, role, create_at from users
+    </select>
+
     <insert id="insert">
-        insert into users(email, pass, name, role)
-        values (#{email}, #{pass}, #{name}, #{role})
+        insert into users(email, pass, name)
+        values (#{email}, #{pass}, #{name})
     </insert>
 
     <update id="update">
         update users
-        set email = #{email},
-            pass = #{email},
-            name = #{name},
-            role = #{role}
-        where id = #{id}
+        set pass = #{pass},
+            name = #{name}
+        where id = #{userId}
     </update>
 
     <delete id="delete">

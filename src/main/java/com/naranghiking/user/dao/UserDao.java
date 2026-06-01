@@ -1,6 +1,7 @@
 package com.naranghiking.user.dao;
 
 import com.naranghiking.user.dto.SignUpRequest;
+import com.naranghiking.user.dto.UpdateRequest;
 import com.naranghiking.user.dto.User;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,11 +13,15 @@ public interface UserDao {
     List<User> selectAll();
     
     // email로 유저 조회
-    User select(String email);
+    User select(String userId);
 
-    int insert(SignUpRequest sign);
+    User findByEmail(String email);
 
-    int update(User user);
+    User findById(String userId);
+
+    int insert(SignUpRequest request);
+
+    int update(UpdateRequest request);
 
     void delete(int id);
 }

@@ -27,6 +27,8 @@ public class JwtFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String token = resolveToken(request);
+        System.out.println("URI: " + request.getRequestURI());
+        System.out.println("Token: " + token);
 		
 		// 토큰이 없는 경우 다음 필터로 => 토큰이 없는 경우는 오류가 아니며 발급이 안된 상태를 의미함.
 		if (token == null) {
@@ -35,12 +37,20 @@ public class JwtFilter extends OncePerRequestFilter {
 		}
 		
 		// 블랙리스트 확인 || 만료 확인
-		if (tokenService.isBlacklisted(token) || jwtUtil.isExpired(token)) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return ;
-		}
+        try {
+            if (tokenService.isBlacklisted(token) || jwtUtil.isExpired(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+        } catch (Exception e) {
+            // 파싱 자체가 실패한 경우 (RS256, 변조된 토큰 등)
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 		
 		String userId= jwtUtil.getUserId(token);
+
+        // JWT 토큰에서 userID 추출 => Spring Security에 등록,
 		UsernamePasswordAuthenticationToken authentication = 
 				new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
