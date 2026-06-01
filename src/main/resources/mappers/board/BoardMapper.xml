@@ -3,27 +3,61 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.naranghiking.board.dao.BoardDao">
+    <resultMap id="BoardDetailMap" type="BoardDetailResponse">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="track_id" property="trackId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="category" property="category"/>
+        <result column="commentCount" property="commentCount"/>
+        <result column="created_at" property="createdAt"/>
+        <collection property="images" column="id" javaType="java.util.List" ofType="java.lang.String" select="selectImagesByBoardId"/>
+        <collection property="comments" column="id" javaType="java.util.List" ofType="BoardCommentResponse" select="selectCommentsByBoardId"/>
+    </resultMap>
 
 <!--  게시글 전체 조회  -->
     <select id="selectAll" resultType="BoardListResponse">
-        SELECT b.id, u.name, b.title, b.category, b.created_at,
+        SELECT b.id, u.name, b.title, b.category,
+               -- 날짜 포맷
+               DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
                -- 댓글 수
                (SELECT count(*)
                   FROM board_comments bc
-                 WHERE bc.board_id = b.id) AS commentCount,
+                 WHERE bc.board_id = b.id) AS comment_count,
                -- 저장된 이미지
                (SELECT stored_filename
                   FROM board_images bi
                  WHERE bi.board_id = b.id
                  LIMIT 1) AS image
-          FROM boards b join users u on b.user_id = u.id
+          FROM boards b JOIN users u ON b.user_id = u.id
          ORDER BY b.id DESC
     </select>
 <!--  게시글 단건 조회  -->
-    <select id="selectById" resultType="boardResponse">
-        SELECT id, user_id, track_id, title, content, category, created_at
-          FROM boards
-         WHERE id = #{id}
+    <select id="selectById" resultMap="BoardDetailMap">
+        SELECT b.id, u.name, b.track_id, b.title, b.content, b.category,
+               -- 날짜 포맷
+               DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
+               -- 댓글 수
+               (SELECT count(*)
+                FROM board_comments bc
+                WHERE bc.board_id = b.id) AS comment_count
+          FROM boards b JOIN users u ON b.user_id = u.id
+         WHERE b.id = #{id}
+    </select>
+    <!--  게시글 단건 조회에 필요한 이미지들 가져오기  -->
+    <select id="selectImagesByBoardId" resultType="String">
+        SELECT stored_filename
+          FROM board_images
+         WHERE board_id = #{id}
+    </select>
+    <!--  게시글 단건 조회에 필요한 댓글들 가져오기  -->
+    <select id="selectCommentsByBoardId" resultType="BoardCommentResponse">
+        SELECT bc.id, u.name, bc.content,
+               -- 날짜 포맷
+               DATE_FORMAT(bc.created_at, '%Y년%m월%d일, %H시%i분') AS created_at
+          FROM board_comments bc JOIN users u ON bc.user_id = u.id
+         WHERE board_id = #{id}
     </select>
 <!--  게시글 생성  -->
     <insert id="insert" parameterType="boardRequest">

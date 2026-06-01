@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Schema(description = "게시글 작성에 필요한 DTO")
 @Getter
 @Setter

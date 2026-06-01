@@ -1,5 +1,6 @@
 package com.naranghiking.board.controller;
 
+import com.naranghiking.board.dto.BoardDetailResponse;
 import com.naranghiking.board.dto.BoardListResponse;
 import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.board.dto.BoardResponse;
@@ -45,10 +46,10 @@ public class BoardController {
             @ApiResponse(responseCode = "404", description = "조회 실패, 게시글을 찾을 수 없습니다.")
     })
     @GetMapping("/{id}") // 게시글 상세 조회
-    public ResponseEntity<ApiResult<BoardResponse>> detail(
+    public ResponseEntity<ApiResult<BoardDetailResponse>> detail(
             @Parameter(description = "게시글 ID, 단일 게시글 조회에 필요", example = "1")
             @PathVariable("id") Long id) {
-        BoardResponse board = boardService.selectById(id);
+        BoardDetailResponse board = boardService.selectById(id);
         return ResponseEntity.ok(ApiResult.success(board));
     }
 
