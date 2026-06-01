@@ -59,7 +59,7 @@ public class UserController {
             @AuthenticationPrincipal String userId,
             @RequestHeader("Authorization") String bearer
     ){
-
+        userService.delete(userId, bearer);
         return ResponseEntity.ok(ApiResult.success(null));
     }
 }

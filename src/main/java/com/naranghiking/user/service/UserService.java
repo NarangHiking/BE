@@ -15,5 +15,5 @@ public interface UserService {
     public List<UserResponse> selectAll();
     public boolean checkPassword(String rawPassword, String encodedPassword);
 
-    void delete(String userId);
+    void delete(String userId, String accessToken);
 }
