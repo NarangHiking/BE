@@ -1,5 +1,6 @@
 package com.naranghiking.user.service;
 
+import com.naranghiking.auth.service.TokenService;
 import com.naranghiking.common.exception.UserNotFoundException;
 import com.naranghiking.user.dao.UserDao;
 import com.naranghiking.user.dto.SignUpRequest;
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
+    private final TokenService tokenService;
 
     public void insert(SignUpRequest request) {
         User user = userDao.select(request.getEmail());
@@ -75,11 +77,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(String userId) {
+    public void delete(String userId, String accessToken) {
         User user = userDao.select(userId);
-        if (user == null) {
-            throw new UserNotFoundException("해당 사용자가 존재하지 않습니다.");
+        if (user == null || user.getRemoveAt() != null) {
+            throw new UserNotFoundException("이미 탈퇴한 사용자입니다.");
         }
+        tokenService.blacklistAccessToken(accessToken);
+        tokenService.deleteRefreshToken(userId);
         userDao.delete(userId);
     }
 }
