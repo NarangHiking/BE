@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<ApiResult<Void>> handleUserNotFound(UserNotFoundException e) {
 	    return ResponseEntity
-	            .status(HttpStatus.NOT_FOUND)
+	            .status(HttpStatus.UNAUTHORIZED)
 	            .body(ApiResult.fail(e.getMessage()));
 	}
 

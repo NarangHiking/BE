@@ -22,17 +22,21 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public TokenResponse login(LoginRequest request) {
-        User user = userServiceImpl.select(request.getEmail());
-        
+
+        User user = userServiceImpl.findByEmail(request.getEmail());
         if (user == null)
             throw new UserNotFoundException("사용자를 찾을 수 없습니다");
-        if (!userServiceImpl.checkPassword(request.getPassword(), user.getPass()))
+
+        System.out.println("rawPassword: " + request.getPass());
+        System.out.println("encodedPassword: " + user.getPass());
+        System.out.println("matches: " + userServiceImpl.checkPassword(request.getPass(), user.getPass()));
+
+        if (!userServiceImpl.checkPassword(request.getPass(), user.getPass()))
         	throw new BadCredentialsException("401_UNAUTHORIZED");
 
         String accessToken =jwtUtil.generateAccessToken(String.valueOf(user.getId()));
         String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getId()));
         tokenService.saveRefreshToken(String.valueOf(user.getId()), refreshToken);
-        
         return new TokenResponse(accessToken, refreshToken, user.getId().toString());
     }
 

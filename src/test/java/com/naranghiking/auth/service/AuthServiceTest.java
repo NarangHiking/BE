@@ -55,7 +55,7 @@ class AuthServiceTest {
 
     @Test
     void login_userNotFound() {
-        given(userServiceImpl.select("wrongEmail")).willReturn(null);
+        given(userServiceImpl.findByEmail("wrongEmail")).willReturn(null);
 
         assertThrows(UserNotFoundException.class,
                 () -> authService.login(new LoginRequest("wrongEmail", "pass1234")));
@@ -63,7 +63,7 @@ class AuthServiceTest {
 
     @Test
     void login_wrongPassword() {
-        given(userServiceImpl.select("hong@test.com")).willReturn(mockUser);
+        given(userServiceImpl.findByEmail("hong@test.com")).willReturn(mockUser);
         given(userServiceImpl.checkPassword("wrongpassword", mockUser.getPass())).willReturn(false);
 
         assertThrows(BadCredentialsException.class,
@@ -72,7 +72,7 @@ class AuthServiceTest {
 
     @Test
     void login_success() {
-        given(userServiceImpl.select("hong@test.com")).willReturn(mockUser);
+        given(userServiceImpl.findByEmail("hong@test.com")).willReturn(mockUser);
         given(userServiceImpl.checkPassword("pass1234", mockUser.getPass())).willReturn(true);
         given(jwtUtil.generateAccessToken("2")).willReturn("accessToken");
         given(jwtUtil.generateRefreshToken("2")).willReturn("refreshToken");

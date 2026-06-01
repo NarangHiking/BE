@@ -1,20 +1,19 @@
 
 -- users 테이블 더미데이터
 INSERT INTO users (email, pass, name, role) VALUES
-    ('admin@naranghiking.com', '{noop}admin1234', '관리자', 'ADMIN'),
-    ('hong@test.com', '{noop}pass1234', '홍길동', 'USER'),
-    ('kim@test.com', '{noop}pass1234', '김철수', 'USER'),
-    ('lee@test.com', '{noop}pass1234', '이영희', 'USER'),
-    ('park@test.com', '{noop}pass1234', '박민수', 'USER'),
-    ('choi@test.com', '{noop}pass1234', '최지우', 'USER'),
-    ('jung@test.com', '{noop}pass1234', '정수진', 'USER'),
-    ('kang@test.com', '{noop}pass1234', '강현우', 'USER'),
-    ('yoon@test.com', '{noop}pass1234', '윤서연', 'USER'),
-    ('oh@test.com', '{noop}pass1234', '오재훈', 'ADMIN');
+    ('admin@naranghiking.com', '$2a$10$c250VxjvhHZeC/KH6U.DuepbKEoK6zV6assPlL84ngrLkvKfuOc.q', '관리자', 'ADMIN'),
+    ('hong@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '홍길동', 'USER'),
+    ('kim@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '김철수', 'USER'),
+    ('lee@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '이영희', 'USER'),
+    ('park@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '박민수', 'USER'),
+    ('choi@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '최지우', 'USER'),
+    ('jung@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '정수진', 'USER'),
+    ('kang@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '강현우', 'USER'),
+    ('yoon@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '서연', 'USER'),
+    ('oh@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '오재훈', 'ADMIN');
 
--- 소프트 삭제 예시 (탈퇴한 유저)
 INSERT INTO users (email, pass, name, role, delete_at) VALUES
-    ('deleted@test.com', '{noop}pass1234', '탈퇴유저', 'USER', '2026-04-01 10:00:00');
+    ('deleted@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '탈퇴유저', 'USER', '2026-04-01 10:00:00');
 
 -- 트랙 더미 데이터
 INSERT INTO tracks (id) VALUES

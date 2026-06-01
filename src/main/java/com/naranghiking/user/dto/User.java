@@ -20,10 +20,7 @@ public class User {
     private LocalDateTime createAt;
     private LocalDateTime removeAt;
 
-    public User(String email, String pass, String name, String role) {
-        this.email = email;
-        this.pass = pass;
-        this.name = name;
-        this.role = role;
+    public UserResponse toResponse() {
+        return new UserResponse(email, name, role, createAt);
     }
 }

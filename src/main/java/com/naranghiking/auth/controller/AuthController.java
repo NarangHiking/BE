@@ -37,7 +37,7 @@ public class AuthController {
     @Operation(summary = "로그인", description = "사용자 정보를 확인합니다")
     @ApiResponses({
         @ApiResponse(responseCode="200", description="로그인 성공"),
-        @ApiResponse(responseCode="404", description="사용자를 찾을 수 없습니다."),
+        @ApiResponse(responseCode="401", description="사용자를 찾을 수 없습니다."),
         @ApiResponse(responseCode="401", description="비밀번호가 일치하지 않습니다."),
     })
     @PostMapping("/login")
@@ -55,7 +55,7 @@ public class AuthController {
     		@Parameter(hidden = true)
     		@AuthenticationPrincipal String userId ,
     		@RequestHeader("Authorization") String bearer) {
-    	String token = bearer.startsWith("Bearer ") ? bearer.substring(7) : bearer;
+    	String token = bearer.substring(7);
     	service.logout(userId, token);
     	return ResponseEntity.ok(ApiResult.success(null));
     }
