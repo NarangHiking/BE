@@ -1,117 +1,93 @@
 package com.naranghiking.auth.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 
+import com.naranghiking.auth.dto.TokenResponse;
 import com.naranghiking.common.exception.UserNotFoundException;
+import com.naranghiking.common.util.JwtUtil;
+import com.naranghiking.user.dao.UserDao;
+import com.naranghiking.user.dto.User;
+import com.naranghiking.user.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.naranghiking.auth.dto.LoginRequest;
+import com.naranghiking.user.service.UserServiceImpl;
+
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
-import org.springframework.boot.data.redis.autoconfigure.DataRedisRepositoriesAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.naranghiking.auth.dto.LoginRequest;
-import com.naranghiking.auth.dto.TokenResponse;
-import com.naranghiking.common.util.JwtUtil;
-import com.naranghiking.user.dto.User;
-import com.naranghiking.user.service.UserServiceImpl;
+import java.util.Optional;
 
-@SpringBootTest
+
+@ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
-	
-	@Autowired
-	private UserServiceImpl userService;
-	
-	@Autowired
-	private TokenService tokenService;
-	
-	@Autowired
-	private JwtUtil jwtUtil;
 
-	@Autowired
-	private AuthService authService;
+    @Mock
+    UserService userServiceImpl;  // UserDao 아닌 UserService
+    @Mock
+    TokenService tokenService;
+    @Mock
+    JwtUtil jwtUtil;
 
+    @InjectMocks
+    AuthService authService;
 
-//        ('admin@naranghiking.com', 'admin1234', '관리자', 'ADMIN'),
-//                ('hong@test.com', 'pass1234', '홍길동', 'USER'),
+    private User mockUser;
+
+    @BeforeEach
+    void setUp() {
+        mockUser = new User();
+        mockUser.setId(2);
+        mockUser.setEmail("hong@test.com");
+        mockUser.setPass("encodedPassword");
+    }
 
     @Test
-	void login_success() {
-		//given
-        LoginRequest request = new LoginRequest("2", "hong@test.com", "pass1234");
+    void login_userNotFound() {
+        given(userServiceImpl.select("wrongEmail")).willReturn(null);
 
-		// when
-		TokenResponse response = authService.login(request);
-		
-		//then
-        assertNotNull(response.getAccessToken());
-        assertNotNull(response.getRefreshToken());
-        assertNotNull(response.getUserId());
+        assertThrows(UserNotFoundException.class,
+                () -> authService.login(new LoginRequest("wrongEmail", "pass1234")));
+    }
 
-        String userId = jwtUtil.getUserId(response.getAccessToken());
-        assertEquals("2", userId);
-	}
-	
-	@Test
-	void login_userNotFound() {
-		//given
-        LoginRequest request = new LoginRequest("-1", "wrongEmail", "pass1234");
+    @Test
+    void login_wrongPassword() {
+        given(userServiceImpl.select("hong@test.com")).willReturn(mockUser);
+        given(userServiceImpl.checkPassword("wrongpassword", mockUser.getPass())).willReturn(false);
 
-		//when
-		assertThrows(UserNotFoundException.class, () -> authService.login(request));
-	}
-	
-	@Test
-	void login_wrongPassword() {
-		//given
-        LoginRequest request = new LoginRequest("2", "hong@test.com", "wrongpassword");
+        assertThrows(BadCredentialsException.class,
+                () -> authService.login(new LoginRequest("hong@test.com", "wrongpassword")));
+    }
 
-		// when
-		assertThrows(BadCredentialsException.class, () -> authService.login(request));
-	}
-	
-//	@Test
-//	void logout() {
-//        //given
-//        LoginRequest request = new LoginRequest("2", "hong@test.com", "pass1234");
-//        TokenResponse loginResponse = authService.login(request);
-//        String userId = loginResponse.getUserId();
-//        String accessToken = loginResponse.getAccessToken();
-//        assertNotNull(tokenService.getRefreshToken(userId));
-//
-//        //when
-//        authService.logout(userId, accessToken);
-//
-//        //then
-//        assertNull(tokenService.getRefreshToken(userId));
-//        assertTrue(tokenService.isBlacklisted(accessToken));
-//    }
-//
-//	@Test
-//	void reissue_success() {
-//        // given — 먼저 로그인해서 진짜 refresh token 얻기
-//        LoginRequest request = new LoginRequest("2","hong@test.com", "pass1234");
-//        TokenResponse loginResponse = authService.login(request);
-//        String refreshToken = loginResponse.getRefreshToken();
-//
-//        // when
-//        TokenResponse result = authService.reissue(refreshToken);
-//
-//		TokenResponse result = authService.reissue("refreshToken");
-//		assertEquals("newAccessToken", result.getAccessToken());
-//	}
-//
-//    @Test
-//    void reissue_fail() {
-//        assertThrows(RuntimeException.class,
-//                () -> authService.reissue("refreshToken"));
-//    }
+    @Test
+    void login_success() {
+        given(userServiceImpl.select("hong@test.com")).willReturn(mockUser);
+        given(userServiceImpl.checkPassword("pass1234", mockUser.getPass())).willReturn(true);
+        given(jwtUtil.generateAccessToken("2")).willReturn("accessToken");
+        given(jwtUtil.generateRefreshToken("2")).willReturn("refreshToken");
+
+        TokenResponse response = authService.login(new LoginRequest("hong@test.com", "pass1234"));
+
+        assertEquals("accessToken", response.getAccessToken());
+        assertEquals("refreshToken", response.getRefreshToken());
+        verify(tokenService).saveRefreshToken("2", "refreshToken");
+    }
+
+    @Test
+    void logout_callsTokenService() {
+        authService.logout("2", "accessToken");
+        verify(tokenService).blacklistAccessToken("accessToken");
+        verify(tokenService).deleteRefreshToken("2");
+    }
 }
