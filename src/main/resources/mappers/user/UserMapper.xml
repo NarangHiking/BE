@@ -37,7 +37,7 @@
 
     <update id="delete">
         update users
-        set delete_at = CURRENT_TIMESTAMP
+        set deleted_at = CURRENT_TIMESTAMP
         where id = #{userId}
     </update>
 

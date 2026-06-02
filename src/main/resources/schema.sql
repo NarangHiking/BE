@@ -8,11 +8,11 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    pass VARCHAR(50) NOT NULL,
+    pass VARCHAR(255) NOT NULL,
     name VARCHAR(50) NOT NULL,
     role ENUM('USER', 'ADMIN') DEFAULT 'USER',
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    delete_at TIMESTAMP DEFAULT NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tracks (
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS boards (
     updated_at TIMESTAMP DEFAULT NULL,
     deleted_at TIMESTAMP DEFAULT NULL,
 	
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (track_id) REFERENCES tracks(id)
 );
 
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS board_images (
     original_filename VARCHAR(255) NOT NULL,
       stored_filename VARCHAR(255) NOT NULL,
 
-    FOREIGN KEY (board_id) REFERENCES boards(id)
+    FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS board_comments (
@@ -52,6 +52,6 @@ CREATE TABLE IF NOT EXISTS board_comments (
     updated_at TIMESTAMP DEFAULT NULL,
     deleted_at TIMESTAMP DEFAULT NULL,
 
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (board_id) REFERENCES boards(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
 );

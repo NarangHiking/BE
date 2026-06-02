@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Tag(name = "게시글과 관련된 컨트롤러", description = "게시글 전체 조회, 게시글 상세 조회")
 @RestController
@@ -37,9 +38,8 @@ public class BoardController {
             @Parameter(description = "제목 및 내용 검색", example = "오늘은") @RequestParam(value = "keyword", required = false) String keyword,
             @Parameter(description = "카테고리로 검색", example = "자유") @RequestParam(value = "category", required = false) String category) {
         List<BoardListResponse> boards = boardService.selectAll(keyword, category); // 키워드랑 카테고리 같이 전달
-        // 게시글이 비어있으면 null이 아닌 비어있는 리스트를 반환
-        if(boards == null) return ResponseEntity.ok(ApiResult.success(Collections.emptyList()));
-        return ResponseEntity.ok(ApiResult.success(boards));
+        // boards가 비어있으면 null이 아닌 비어있는 리스트를 반환
+        return ResponseEntity.ok(ApiResult.success(Objects.requireNonNullElse(boards, Collections.emptyList())));
     }
 
     @Operation(summary = "게시글 상세 조회", description = "boards의 PK인 id를 통해서 단건의 게시글만 조회합니다.")
