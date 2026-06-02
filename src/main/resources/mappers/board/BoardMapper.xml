@@ -78,12 +78,13 @@
            SET title = #{board.title},
                content = #{board.content},
                category = #{board.category},
-               updated_at = DEFAULT
+               updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}
     </update>
 <!--  게시글 삭제  -->
-    <delete id="deleteById">
-        DELETE FROM boards
+    <update id="deleteById">
+        UPDATE boards
+           SET deleted_at = CURRENT_TIMESTAMP
          WHERE id = #{id}
-    </delete>
+    </update>
 </mapper>

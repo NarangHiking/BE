@@ -12,7 +12,7 @@ INSERT INTO users (email, pass, name, role) VALUES
     ('yoon@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '서연', 'USER'),
     ('oh@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '오재훈', 'ADMIN');
 
-INSERT INTO users (email, pass, name, role, delete_at) VALUES
+INSERT INTO users (email, pass, name, role, deleted_at) VALUES
     ('deleted@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '탈퇴유저', 'USER', '2026-04-01 10:00:00');
 
 -- 트랙 더미 데이터
