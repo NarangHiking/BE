@@ -17,10 +17,10 @@ public class User {
     private String pass;
     private String name;
     private String role;
-    private LocalDateTime createAt;
-    private LocalDateTime removeAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime removedAt;
 
     public UserResponse toResponse() {
-        return new UserResponse(email, name, role, createAt);
+        return new UserResponse(email, name, role, createdAt);
     }
 }

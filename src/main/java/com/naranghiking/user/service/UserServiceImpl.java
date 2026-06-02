@@ -7,13 +7,11 @@ import com.naranghiking.user.dto.SignUpRequest;
 import com.naranghiking.user.dto.UpdateRequest;
 import com.naranghiking.user.dto.User;
 import com.naranghiking.user.dto.UserResponse;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -79,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(String userId, String accessToken) {
         User user = userDao.select(userId);
-        if (user == null || user.getRemoveAt() != null) {
+        if (user == null || user.getRemovedAt() != null) {
             throw new UserNotFoundException("이미 탈퇴한 사용자입니다.");
         }
         tokenService.blacklistAccessToken(accessToken);
