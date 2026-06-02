@@ -15,12 +15,12 @@
     </select>
 
     <select id="select">
-        select email, name, role, create_at from users
+        select email, name, role, created_at from users
         where id = #{userId}
     </select>
 
     <select id="selectAll">
-        select email, name, role, create_at from users
+        select email, name, role, created_at from users
     </select>
 
     <insert id="insert">
@@ -37,7 +37,7 @@
 
     <update id="delete">
         update users
-        set delete_at = CURRENT_TIMESTAMP
+        set deleted_at = CURRENT_TIMESTAMP
         where id = #{userId}
     </update>
 
