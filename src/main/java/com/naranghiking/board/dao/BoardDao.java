@@ -3,11 +3,9 @@ package com.naranghiking.board.dao;
 import com.naranghiking.board.dto.BoardDetailResponse;
 import com.naranghiking.board.dto.BoardListResponse;
 import com.naranghiking.board.dto.BoardRequest;
-import com.naranghiking.board.dto.BoardResponse;
 import com.naranghiking.common.dto.ImageRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,6 +21,9 @@ public interface BoardDao {
     void insertImages(@Param("id") Long id, @Param("images")List<ImageRequest> images);
     // 게시글 수정
     int update(@Param("id") Long id, @Param("board") BoardRequest board);
+    // 게시글 수정 시 기존 이미지 삭제
+    void deleteImages(List<String> deletedImages);
     // 게시글 삭제
     int deleteById(Long id);
+
 }
