@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naranghiking.mtn.dao.MtnDao">
+
+<!--  게시글 전체 조회  -->
+    <select id="selectAll">
+        select * from mountains
+    </select>
+<!--  게시글 단건 조회  -->
+    <select id="select">
+        select * from mountains
+        where id = #{id}
+    </select>
+
+</mapper>

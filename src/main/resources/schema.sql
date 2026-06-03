@@ -15,6 +15,15 @@ CREATE TABLE IF NOT EXISTS users (
     deleted_at TIMESTAMP DEFAULT NULL
 );
 
+CREATE TABLE IF NOT EXISTS mountains (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY ,
+    name VARCHAR(50) NOT NULL,
+    height BIGINT NOT NULL ,
+    description TEXT NOT NULL ,
+    original_filename VARCHAR(255),
+    stored_filename VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS tracks (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY
 );
