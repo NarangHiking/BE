@@ -31,6 +31,15 @@
                  WHERE bi.board_id = b.id
                  LIMIT 1) AS image
           FROM boards b JOIN users u ON b.user_id = u.id
+        <where>
+            <if test="keyword != null"> <!--키워드로 탐색-->
+                (title LIKE CONCAT('%', #{keyword}, '%')) OR
+                (content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="category != null"> <!--카테고리로 탐색-->
+                AND (category = #{category})
+            </if>
+        </where>
          ORDER BY b.id DESC
     </select>
 <!--  게시글 단건 조회  -->
@@ -78,12 +87,22 @@
            SET title = #{board.title},
                content = #{board.content},
                category = #{board.category},
-               updated_at = DEFAULT
+               updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}
     </update>
-<!--  게시글 삭제  -->
-    <delete id="deleteById">
-        DELETE FROM boards
-         WHERE id = #{id}
+
+    <!--  게시글 수정 시 기존 이미지 삭제  -->
+    <delete id="deleteImages">
+        DELETE FROM board_images
+         WHERE stored_filename IN
+         <foreach collection="deletedImages" item="image" open="(" separator="," close=")">
+             #{image}
+         </foreach>
     </delete>
+<!--  게시글 삭제  -->
+    <update id="deleteById">
+        UPDATE boards
+           SET deleted_at = CURRENT_TIMESTAMP
+         WHERE id = #{id}
+    </update>
 </mapper>

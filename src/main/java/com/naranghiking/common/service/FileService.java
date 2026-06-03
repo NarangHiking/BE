@@ -49,4 +49,19 @@ public class FileService {
 
         return storedFilenames;
     }
+
+    public void deleteFiles(List<String> deletedImages, String pivot) {
+        if(deletedImages == null || deletedImages.isEmpty()) return;
+
+        String path = "";
+        // pivot이 board인 경우에는 게시글에서 넘어온 이미지
+        if(pivot.equals("board")) path = "boardImages";
+
+        File dir = new File(imagesDir + path);
+
+        for(String image : deletedImages) { // 해당 image가 경로에 존재하면 삭제
+            File file = new File(dir.getAbsolutePath(), image);
+            if(file.exists()) file.delete();
+        }
+    }
 }
