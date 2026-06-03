@@ -1,14 +1,27 @@
 .
-# 나랑하이킹 BE 개발일지
+# 개발일지 - 2026년 6월 2일
+
+## 작업 내용
+
+### 🐛 버그 수정 - accessToken 파싱 오류 (황우찬)
+- **PR #20** | `auth` 브랜치
+- accessToken 값 앞에 `'bearer'` 문자열이 중복으로 포함되는 버그 수정
+- JWT 필터 또는 토큰 생성 로직에서 prefix가 이중으로 붙던 문제 해결
 
 ---
 
-## 2026-06-02
+### ♻️ 게시글 삭제 방식 변경 - Hard delete → Soft delete (jamonda1)
+- **PR #21** | `feat/board` 브랜치
+- 게시글 삭제 시 DB에서 즉시 제거(Hard delete)하던 방식을
+  `deleted_at` 등의 플래그를 활용한 논리 삭제(Soft delete)로 전환
+- 데이터 복구 가능성 및 감사(audit) 추적 대응
 
-### UserService에 TokenService 주입
-- 회원 탈퇴 시 토큰 처리를 위해 `UserService`에 `TokenService` 의존성 추가
-- 탈퇴 흐름: 블랙리스트 등록 → refresh token 삭제 → 유저 삭제
-- `Auth → User → Token` 단방향 의존성 유지, 순환 의존성 없음
+---
+
+### ✅ 게시글 수정 로직 완성 (jamonda1)
+- **PR #22** | `feat/board` 브랜치
+- 게시글 수정 API 구현 완료
+- 수정 대상 검증 및 업데이트 처리 로직 포함
 
 ---
 
