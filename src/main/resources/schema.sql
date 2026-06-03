@@ -20,9 +20,7 @@ CREATE TABLE IF NOT EXISTS mountains (
     name VARCHAR(50) NOT NULL,
     location VARCHAR(255) NOT NULL ,
     height BIGINT NOT NULL ,
-    description TEXT NOT NULL ,
-    original_filename VARCHAR(255),
-    stored_filename VARCHAR(255)
+    description TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tracks (

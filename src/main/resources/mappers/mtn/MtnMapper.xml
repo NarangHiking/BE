@@ -24,9 +24,7 @@
         set name = #{name},
             location = #{location},
             height = #{height},
-            description = #{description},
-            original_filename = #{originalFilename},
-            stored_filename = #{storedFilename}
+            description = #{description}
         where id = #{id}
     </update>
 

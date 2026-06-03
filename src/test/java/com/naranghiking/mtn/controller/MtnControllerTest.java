@@ -34,6 +34,7 @@ class MtnControllerTest {
     private static Mtn testMtn;
 
     private String adminToken;
+    private String userToken;
 
     @BeforeAll
     static void setUp() {
@@ -47,6 +48,7 @@ class MtnControllerTest {
     @BeforeEach
     void setUpToken() {
         adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
+        userToken = jwtUtil.generateAccessToken("2", "USER");
     }
 
     @Test
@@ -142,4 +144,15 @@ class MtnControllerTest {
                 .anyMatch(m -> "수정된 산".equals(m.getName()));
         Assertions.assertFalse(exists);
     }
+
+    @Test
+    @Order(2)
+    @DisplayName("산 추가 - 일반유저")
+    void userInsert() throws Exception {
+        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testMtn)))
+                .andExpect(status().isForbidden());
+    }
+
 }
