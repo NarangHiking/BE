@@ -1,8 +1,11 @@
 package com.naranghiking.auth.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		
 		// 토큰이 없는 경우 다음 필터로 => 토큰이 없는 경우는 오류가 아니며 발급이 안된 상태를 의미함.
 		if (token == null) {
+            System.out.println("토큰 없음, 통과");
 			filterChain.doFilter(request, response);
 			return ;
 		}
@@ -49,10 +53,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 		
 		String userId= jwtUtil.getUserId(token);
+        String role = jwtUtil.getRole(token);
+
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
 
         // JWT 토큰에서 userID 추출 => Spring Security에 등록,
 		UsernamePasswordAuthenticationToken authentication = 
-				new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+				new UsernamePasswordAuthenticationToken(userId, null, authorities);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		filterChain.doFilter(request, response);
 	}

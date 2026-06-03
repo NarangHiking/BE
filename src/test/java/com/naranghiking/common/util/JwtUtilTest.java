@@ -27,20 +27,20 @@ class JwtUtilTest {
 	
 	@Test
 	void generateAccessToken() {
-		String token = jwtUtil.generateAccessToken("123");
+		String token = jwtUtil.generateAccessToken("123", "USER");
 		assertNotNull(token);
 		assertEquals("123", jwtUtil.getUserId(token));
 	}
 	
 	@Test
 	void isNotExpired() {
-		String token = jwtUtil.generateAccessToken("123");
+		String token = jwtUtil.generateAccessToken("123", "USER");
 		assertFalse(jwtUtil.isExpired(token));
 	}
 	
 	@Test
 	void getReaminExpiration() {
-		String token = jwtUtil.generateAccessToken("123");
+		String token = jwtUtil.generateAccessToken("123", "USER");
 		assertTrue(jwtUtil.getRemainExpiration(token) > 0);
 	}
 }

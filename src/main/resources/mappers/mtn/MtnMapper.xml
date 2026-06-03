@@ -4,14 +4,34 @@
 
 <mapper namespace="com.naranghiking.mtn.dao.MtnDao">
 
-<!--  게시글 전체 조회  -->
-    <select id="selectAll">
+<!--  산 전체 조회 -->
+    <select id="selectAll" resultType="com.naranghiking.mtn.dto.Mtn">
         select * from mountains
     </select>
-<!--  게시글 단건 조회  -->
-    <select id="select">
+<!--  산 단일 조회  -->
+    <select id="select" resultType="com.naranghiking.mtn.dto.Mtn">
         select * from mountains
         where id = #{id}
     </select>
 
+    <insert id="insert">
+        insert into mountains (name, location, height, description)
+        values (#{name}, #{location}, #{height}, #{description})
+    </insert>
+
+    <update id="update">
+        update mountains
+        set name = #{name},
+            location = #{location},
+            height = #{height},
+            description = #{description},
+            original_filename = #{originalFilename},
+            stored_filename = #{storedFilename}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from mountains
+        where id = #{id}
+    </delete>
 </mapper>
