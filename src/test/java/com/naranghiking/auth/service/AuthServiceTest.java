@@ -51,6 +51,7 @@ class AuthServiceTest {
         mockUser.setId(2);
         mockUser.setEmail("hong@test.com");
         mockUser.setPass("encodedPassword");
+        mockUser.setRole("USER");
     }
 
     @Test
@@ -74,8 +75,8 @@ class AuthServiceTest {
     void login_success() {
         given(userServiceImpl.findByEmail("hong@test.com")).willReturn(mockUser);
         given(userServiceImpl.checkPassword("pass1234", mockUser.getPass())).willReturn(true);
-        given(jwtUtil.generateAccessToken("2")).willReturn("accessToken");
-        given(jwtUtil.generateRefreshToken("2")).willReturn("refreshToken");
+        given(jwtUtil.generateAccessToken("2", "USER")).willReturn("accessToken");
+        given(jwtUtil.generateRefreshToken("2", "USER")).willReturn("refreshToken");
 
         TokenResponse response = authService.login(new LoginRequest("hong@test.com", "pass1234"));
 

@@ -2,8 +2,8 @@ package com.naranghiking.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,7 +12,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,6 +26,19 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final JwtFilter jwtFilter;
+
+    String [] permitUrls = {
+            "/api/auth/login",
+            "/user/register",
+            "/error",
+            "/board/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    };
+
+    String [] adminUrls = {
+        "/mtn/**"
+    };
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -50,19 +62,22 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth-> auth
-                        .requestMatchers("/api/auth/login", "/user/register","/error",
-                                "/board/**", "/swagger-ui/**", "/v3/api-docs/**" ).permitAll()
+                        .requestMatchers(permitUrls).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/mtn/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/list").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, adminUrls).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, adminUrls).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, adminUrls).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, adminUrls).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                ;
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     
     // 기존 PasswordEncoderFactories.createDelegatingPasswordEncoder()
     // 변경 new BCryptPasswordEncoder
-    //
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

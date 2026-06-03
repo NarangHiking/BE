@@ -34,8 +34,8 @@ public class AuthService {
         if (!userServiceImpl.checkPassword(request.getPass(), user.getPass()))
         	throw new BadCredentialsException("401_UNAUTHORIZED");
 
-        String accessToken =jwtUtil.generateAccessToken(String.valueOf(user.getId()));
-        String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getId()));
+        String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getId()), user.getRole());
+        String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getId()), user.getRole());
         tokenService.saveRefreshToken(String.valueOf(user.getId()), refreshToken);
         return new TokenResponse(accessToken, refreshToken, user.getId().toString());
     }
@@ -55,7 +55,8 @@ public class AuthService {
         if (saved == null || !saved.equals(refreshToken)) {
             throw new InvalidTokenException("유효하지 않은 Refresh Token");
         }
-        String newAccessToken = jwtUtil.generateAccessToken(userId);
+        String role = jwtUtil.getRole(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(userId, role);
         return new TokenResponse(newAccessToken, refreshToken, userId);
     }
 }

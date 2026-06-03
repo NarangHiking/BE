@@ -28,9 +28,10 @@ public class JwtUtil {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String userId) {
+    public String generateAccessToken(String userId, String role) {
         return Jwts.builder()
                 .subject(userId)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessExpiration))
                 .signWith(getSignKey())
@@ -38,9 +39,10 @@ public class JwtUtil {
     }
 
     // Refresh Token 생성
-    public String generateRefreshToken(String userId) {
+    public String generateRefreshToken(String userId, String role) {
         return Jwts.builder()
                 .subject(userId)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getSignKey())
@@ -49,6 +51,10 @@ public class JwtUtil {
 
     public String getUserId(String token) {
         return getClaims(token).getSubject();
+    }
+
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
     public boolean isExpired(String token) {

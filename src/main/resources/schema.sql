@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS mountains (
     id BIGINT AUTO_INCREMENT PRIMARY KEY ,
     name VARCHAR(50) NOT NULL,
+    location VARCHAR(255) NOT NULL ,
     height BIGINT NOT NULL ,
     description TEXT NOT NULL ,
     original_filename VARCHAR(255),

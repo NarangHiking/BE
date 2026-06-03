@@ -65,5 +65,4 @@ public class MtnController {
         mtnService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResult.success(null));
     }
-
 }
