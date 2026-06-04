@@ -11,4 +11,8 @@ public interface BoardCommentDao {
     BoardCommentResponse selectById(Long id);
     // 댓글 작성
     int insert(@Param("boardId") Long boardId, @Param("comment") BoardCommentRequest comment);
+    // 댓글 수정
+    int update(@Param("comment") BoardCommentRequest comment);
+    // 댓글 삭제(논리적)
+    int delete(Long commentId);
 }

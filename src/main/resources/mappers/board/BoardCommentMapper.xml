@@ -14,4 +14,17 @@
         INSERT INTO board_comments (user_id, board_id, content)
         VALUES (#{comment.userId}, #{boardId}, #{comment.content})
     </insert>
+<!--  댓글 수정  -->
+    <update id="update">
+        UPDATE board_comments
+           SET content = #{comment.content},
+               updated_at = CURRENT_TIMESTAMP
+         WHERE id = #{comment.id}
+    </update>
+<!--  댓글 삭제  -->
+    <update id="delete">
+        UPDATE board_comments
+           SET deleted_at = CURRENT_TIMESTAMP
+         WHERE id = #{commentId}
+    </update>
 </mapper>

@@ -9,4 +9,8 @@ public interface BoardCommentService {
     BoardCommentResponse selectById(Long id);
     // 댓글 생성
     BoardCommentResponse insert(Long boardId, @Valid BoardCommentRequest comment);
+    // 댓글 수정
+    BoardCommentResponse update(@Valid BoardCommentRequest comment);
+    // 댓글 삭제(논리적)
+    void delete(Long commentId);
 }
