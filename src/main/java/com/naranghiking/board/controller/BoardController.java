@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@Tag(name = "게시글과 관련된 컨트롤러", description = "게시글 전체 조회, 게시글 상세 조회")
+@Tag(name = "게시글과 관련된 컨트롤러")
 @RestController
 @RequestMapping("/board")
 @RequiredArgsConstructor
