@@ -53,7 +53,7 @@ public class AuthController {
     @PostMapping("/logout")
     ResponseEntity<ApiResult<Void>> logout(
     		@Parameter(hidden = true)
-    		@AuthenticationPrincipal String userId ,
+    		@AuthenticationPrincipal Long userId ,
     		@RequestHeader("Authorization") String bearer) {
     	String token = bearer.substring(7);
     	service.logout(userId, token);

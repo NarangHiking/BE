@@ -34,13 +34,13 @@ public class AuthService {
         if (!userServiceImpl.checkPassword(request.getPass(), user.getPass()))
         	throw new BadCredentialsException("401_UNAUTHORIZED");
 
-        String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getId()), user.getRole());
-        String refreshToken =jwtUtil.generateRefreshToken(String.valueOf(user.getId()), user.getRole());
-        tokenService.saveRefreshToken(String.valueOf(user.getId()), refreshToken);
-        return new TokenResponse(accessToken, refreshToken, user.getId().toString());
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole());
+        String refreshToken =jwtUtil.generateRefreshToken(user.getId(), user.getRole());
+        tokenService.saveRefreshToken(user.getId(), refreshToken);
+        return new TokenResponse(accessToken, refreshToken, user.getId());
     }
 
-    public void logout(String userId, String accessToken) {
+    public void logout(Long userId, String accessToken) {
         tokenService.blacklistAccessToken(accessToken);
         tokenService.deleteRefreshToken(userId);
     }
@@ -50,7 +50,7 @@ public class AuthService {
     		throw new TokenExpiredException("refresh token 만료");
     	}
     	
-    	String userId = jwtUtil.getUserId(refreshToken);
+    	Long userId = jwtUtil.getUserId(refreshToken);
         String saved = tokenService.getRefreshToken(userId);
         if (saved == null || !saved.equals(refreshToken)) {
             throw new InvalidTokenException("유효하지 않은 Refresh Token");

@@ -21,7 +21,7 @@ public class MtnServiceImpl implements MtnService {
     }
 
     @Override
-    public Mtn select(Integer id) {
+    public Mtn select(Long id) {
         return mtnDao.select(id);
     }
 
@@ -36,7 +36,7 @@ public class MtnServiceImpl implements MtnService {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
         mtnDao.delete(id);
     }
 }

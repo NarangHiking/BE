@@ -35,8 +35,8 @@ class AuthServiceIntegrationTest {
         assertNotNull(response.getAccessToken());
         assertNotNull(response.getRefreshToken());
 
-        String userId = jwtUtil.getUserId(response.getAccessToken());
-        assertEquals("2", userId);
+        Long userId = jwtUtil.getUserId(response.getAccessToken());
+        assertEquals(2L, userId);
     }
 
     @Test
@@ -70,7 +70,7 @@ class AuthServiceIntegrationTest {
 
         // then
         assertNotNull(result.getAccessToken());
-        assertEquals("2", jwtUtil.getUserId(result.getAccessToken())); // 새 토큰 발급됐는지
+        assertEquals(2L, jwtUtil.getUserId(result.getAccessToken())); // 새 토큰 발급됐는지
         assertEquals(refreshToken, result.getRefreshToken()); // refresh는 그대로
     }
 

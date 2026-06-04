@@ -42,18 +42,6 @@
         </if>
     </select>
 
-    <select id="selectFavorites">
-        select <include refid="trackColumns"/>
-        from tracks t
-        join favorites f on f.user_id = #{userId} and f.track_id = t.id
-    </select>
-
-    <select id="selectRecommends">
-        select <include refid="trackColumns"/>
-        from tracks t
-        join recommends r on r.user_id = #{userId} and r.track_id = t.id
-    </select>
-
     <select id="selectById">
         select <include refid="trackColumns"/>
         from tracks t

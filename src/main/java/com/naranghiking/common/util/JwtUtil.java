@@ -28,9 +28,9 @@ public class JwtUtil {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String userId, String role) {
+    public String generateAccessToken(Long userId, String role) {
         return Jwts.builder()
-                .subject(userId)
+                .subject(userId.toString())
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessExpiration))
@@ -39,9 +39,9 @@ public class JwtUtil {
     }
 
     // Refresh Token 생성
-    public String generateRefreshToken(String userId, String role) {
+    public String generateRefreshToken(Long userId, String role) {
         return Jwts.builder()
-                .subject(userId)
+                .subject(userId.toString())
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
@@ -49,8 +49,8 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String getUserId(String token) {
-        return getClaims(token).getSubject();
+    public Long getUserId(String token) {
+        return Long.parseLong(getClaims(token).getSubject());
     }
 
     public String getRole(String token) {

@@ -46,8 +46,8 @@ class MtnControllerTest {
 
     @BeforeEach
     void setUpToken() {
-        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
-        userToken = jwtUtil.generateAccessToken("2", "USER");
+        adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
+        userToken = jwtUtil.generateAccessToken(2L, "USER");
     }
 
     @Test

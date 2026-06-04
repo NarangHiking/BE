@@ -14,17 +14,17 @@ public class TokenService {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtil jwtUtil;
 
-    public void saveRefreshToken(String userId, String refreshToken) {
+    public void saveRefreshToken(Long userId, String refreshToken) {
         long expiration = jwtUtil.getRemainExpiration(refreshToken);
         redisTemplate.opsForValue()
                 .set("RT:"+userId, refreshToken, expiration, TimeUnit.MILLISECONDS);
     }
 
-    public String getRefreshToken(String userId) {
+    public String getRefreshToken(Long userId) {
         return redisTemplate.opsForValue().get("RT:"+userId);
     }
 
-    public void deleteRefreshToken(String userId) {
+    public void deleteRefreshToken(Long userId) {
         redisTemplate.delete("RT:"+userId);
     }
 

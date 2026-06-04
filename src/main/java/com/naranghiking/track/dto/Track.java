@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Track {
-    private Integer id;
-    private Integer mountainId;
+    private Long id;
+    private Long mountainId;
     private String name;
     private String gpxFilePath;
     private Integer recommendCnt;

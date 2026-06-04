@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
 
     public void insert(SignUpRequest request) {
-        User user = userDao.select(request.getEmail());
+        User user = userDao.findByEmail(request.getEmail());
         if (user != null) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
@@ -39,13 +39,13 @@ public class UserServiceImpl implements UserService {
 
     // 내부 전달용
     @Override
-    public User findById(String userId) {
+    public User findById(Long userId) {
         return userDao.findById(userId);
     }
 
     // 사용자 전달용, 관리자만
     @Override
-    public UserResponse selectById(String userId) {
+    public UserResponse selectById(Long userId) {
         return userDao.select(userId).toResponse();
     }
 
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         return userResponses;
     }
 
-    public int update(String userId, UpdateRequest request) {
+    public int update(Long userId, UpdateRequest request) {
         User user = userDao.select(userId);
         if (user == null) {
             throw new UserNotFoundException("해당 사용자가 존재하지 않습니다.");
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(String userId, String accessToken) {
+    public void delete(Long userId, String accessToken) {
         User user = userDao.select(userId);
         if (user == null || user.getRemovedAt() != null) {
             throw new UserNotFoundException("이미 탈퇴한 사용자입니다.");

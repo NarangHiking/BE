@@ -28,7 +28,7 @@ public class MtnController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResult> select(
-            @PathVariable Integer id
+            @PathVariable Long id
     ) {
         Mtn mtn = mtnService.select(id);
         if (mtn == null) {
@@ -38,7 +38,7 @@ public class MtnController {
     }
 
     @GetMapping("/{mtnId}/track")
-    public ResponseEntity<ApiResult> selectByMtnId(@PathVariable int mtnId) {
+    public ResponseEntity<ApiResult> selectByMtnId(@PathVariable Long mtnId) {
         List<Track> li = trackService.selectByMtnId(mtnId);
         return ResponseEntity.ok(ApiResult.success(li));
     }
@@ -57,7 +57,7 @@ public class MtnController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResult> update(
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @RequestBody Mtn mtn
     ) {
         Mtn target = mtnService.select(id);
@@ -70,7 +70,7 @@ public class MtnController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResult> delete(
-            @PathVariable Integer id
+            @PathVariable Long id
     ) {
         mtnService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResult.success(null));

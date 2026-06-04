@@ -83,7 +83,7 @@ class JwtFilterTest {
     	when(request.getHeader("Authorization")).thenReturn("Bearer accessToken");
     	when(tokenService.isBlacklisted("accessToken")).thenReturn(false);
     	when(jwtUtil.isExpired("accessToken")).thenReturn(false);
-    	when(jwtUtil.getUserId("accessToken")).thenReturn("123");
+    	when(jwtUtil.getUserId("accessToken")).thenReturn(123L);
     	
     	jwtFilter.doFilterInternal(request, response, filterChain);
     	
