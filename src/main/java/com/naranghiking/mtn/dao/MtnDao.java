@@ -10,6 +10,8 @@ public interface MtnDao {
 
     List<Mtn> selectAll();
 
+    List<Mtn> selectByName(String name);
+
     Mtn select(Integer id);
 
     int insert(Mtn mtn);

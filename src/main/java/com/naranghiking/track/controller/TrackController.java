@@ -1,0 +1,63 @@
+package com.naranghiking.track.controller;
+
+import com.naranghiking.common.dto.ApiResult;
+import com.naranghiking.track.dto.Track;
+import com.naranghiking.track.dto.TrackCondition;
+import com.naranghiking.track.service.TrackService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/track")
+public class TrackController {
+    private final TrackService trackService;
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResult> selectByName(@RequestParam String name) {
+        List<Track> li = trackService.selectByName(name);
+        return ResponseEntity.ok(ApiResult.success(li));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResult> selectByCondition(@ModelAttribute TrackCondition condition) {
+        List<Track> li = trackService.selectByCondition(condition);
+        return ResponseEntity.ok(ApiResult.success(li));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResult> selectById(@PathVariable int id) {
+        Track track = trackService.selectById(id);
+        if (track == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND) // UNAUTHORIZED → NOT_FOUND
+                    .body(ApiResult.fail("해당 아이디의 경로를 찾을 수 없습니다."));
+        return ResponseEntity.ok(ApiResult.success(track));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResult> insert(@RequestBody Track t) {
+        // id 중복 체크 제거 (AUTO_INCREMENT라 의미 없음)
+        trackService.insert(t);
+        return ResponseEntity.ok(ApiResult.success(t)); // ApiResult.success 중첩 제거
+    }
+
+    @PutMapping
+    public ResponseEntity<ApiResult> update(@RequestBody Track t) {
+        Track target = trackService.selectById(t.getId());
+        if (target == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND) // UNAUTHORIZED → NOT_FOUND
+                    .body(ApiResult.fail("해당 경로가 존재하지 않습니다."));
+        trackService.update(t);
+        return ResponseEntity.ok(ApiResult.success(t));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResult> delete(@PathVariable int id) {
+        trackService.delete(id);
+        return ResponseEntity.ok(ApiResult.success("ok"));
+    }
+}

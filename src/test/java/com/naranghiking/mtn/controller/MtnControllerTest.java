@@ -7,16 +7,15 @@ import com.naranghiking.mtn.service.MtnService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
+@AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MtnControllerTest {
 
@@ -71,9 +70,18 @@ class MtnControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.name").value("테스트 산"));
     }
-
     @Test
     @Order(3)
+    @DisplayName("산 추가 - 일반유저")
+    void userInsert() throws Exception {
+        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testMtn)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(4)
     @DisplayName("산 단일 조회")
     void select() throws Exception {
         // insert된 산의 id를 가져옴
@@ -89,7 +97,7 @@ class MtnControllerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @DisplayName("존재하지 않는 산 단일 조회 - 실패")
     void selectNotFound() throws Exception {
         mockMvc.perform(get("/mtn/999999"))
@@ -97,7 +105,7 @@ class MtnControllerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @DisplayName("산 수정")
     void update() throws Exception {
         Mtn inserted = mtnService.selectAll().stream()
@@ -118,7 +126,7 @@ class MtnControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     @DisplayName("산 삭제")
     void mtnDelete() throws Exception {
         Mtn inserted = mtnService.selectAll().stream()
@@ -136,7 +144,7 @@ class MtnControllerTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @DisplayName("삭제 후 조회 - 실패 확인")
     void selectAfterDelete() throws Exception {
         // 삭제된 산은 더 이상 조회되지 않아야 함
@@ -146,13 +154,11 @@ class MtnControllerTest {
     }
 
     @Test
-    @Order(2)
-    @DisplayName("산 추가 - 일반유저")
-    void userInsert() throws Exception {
-        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testMtn)))
-                .andExpect(status().isForbidden());
+    @Order(9)
+    @DisplayName("산 하위 경로 표시")
+    void selectPathFromMtn() throws Exception {
+        mockMvc.perform(get("/mtn/1/track"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
-
 }

@@ -4,19 +4,25 @@
 
 <mapper namespace="com.naranghiking.mtn.dao.MtnDao">
 
-<!--  산 전체 조회 -->
+    <!--  산 전체 조회 -->
     <select id="selectAll" resultType="com.naranghiking.mtn.dto.Mtn">
         select * from mountains
     </select>
-<!--  산 단일 조회  -->
+
+    <!-- 산 이름으로 조회 -->
+    <select id="selectByName">
+        select * from mountains
+        where name like CONCAT('%', #{name}, '%')
+    </select>
+    <!--  산 단일 조회  -->
     <select id="select" resultType="com.naranghiking.mtn.dto.Mtn">
         select * from mountains
         where id = #{id}
     </select>
-
+    <!-- 산 정보 삽입 -->
     <insert id="insert">
-        insert into mountains (name, location, height, description)
-        values (#{name}, #{location}, #{height}, #{description})
+        insert into mountains (name, location, height, description, original_filename, stored_filename)
+        values (#{name}, #{location}, #{height}, #{description}, #{originalFilename}, #{storedFilename})
     </insert>
 
     <update id="update">

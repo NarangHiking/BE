@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naranghiking.track.dao.TrackDao">
+    <!--트랙 SELECT 공통 반환 값들 -->
+    <sql id="trackColumns">
+        t.id, mountain_id, name, gpx_file_path,
+        (select count(*) from recommends where track_id = t.id) as recommend_cnt
+    </sql>
+
+    <select id="selectByMtnId">
+        select  <include refid="trackColumns"/>
+        from tracks t
+        where mountain_id = #{mountainId}
+    </select>
+    
+    <select id="selectByName">
+        select <include refid="trackColumns"/>
+        from tracks t
+        where name like CONCAT('%', #{name}, '%')
+    </select>
+
+    <select id="selectByCondition">
+        select <include refid="trackColumns"/>
+        from tracks t
+        <if test="(mtnName != null and mtnName !='') or (location != null and location !='')or height != null">
+            where mountain_id in (
+                select id from mountains
+                <where>
+                    <if test="mtnName != null and mtnName !=''">
+                        AND name like CONCAT('%',#{mtnName},'%')
+                    </if>
+                    <if test="location != null and location !=''">
+                        AND location like CONCAT('%',#{location},'%')
+                    </if>
+                    <if test="height != null">
+                        AND height >= #{height}
+                    </if>
+                </where>
+            )
+        </if>
+    </select>
+
+    <select id="selectFavorites">
+        select <include refid="trackColumns"/>
+        from tracks t
+        join favorites f on f.user_id = #{userId} and f.track_id = t.id
+    </select>
+
+    <select id="selectRecommends">
+        select <include refid="trackColumns"/>
+        from tracks t
+        join recommends r on r.user_id = #{userId} and r.track_id = t.id
+    </select>
+
+    <select id="selectById">
+        select <include refid="trackColumns"/>
+        from tracks t
+        where id = #{id}
+    </select>
+
+    <insert id="insert">
+        insert into tracks(mountain_id, name, gpx_file_path)
+        values(#{mountainId}, #{name}, #{gpxFilePath})
+    </insert>
+
+    <update id="update">
+        update tracks
+        set     mountain_id = #{mountainId},
+                name = #{name},
+                gpx_file_path = #{gpxFilePath}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from tracks
+        where id = #{id}
+    </delete>
+</mapper>

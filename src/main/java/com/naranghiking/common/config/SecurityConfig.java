@@ -37,7 +37,8 @@ public class SecurityConfig {
     };
 
     String [] adminUrls = {
-        "/mtn/**"
+            "/mtn/**",
+            "/tracks/**"
     };
 
     @Bean
@@ -63,7 +64,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth-> auth
                         .requestMatchers(permitUrls).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/mtn/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/mtn/**", "/track/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/user/list").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, adminUrls).hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, adminUrls).hasRole("ADMIN")
