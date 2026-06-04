@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naranghiking.board.dao.BoardCommentDao">
+<!--  댓글 조회  -->
+    <select id="selectById" resultType="BoardCommentResponse">
+        SELECT bc.id, u.name, bc.content, bc.created_at
+          FROM board_comments bc JOIN users u ON bc.user_id = u.id
+         WHERE bc.id = #{id}
+    </select>
+<!--  댓글 작성  -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="comment.id">
+        INSERT INTO board_comments (user_id, board_id, content)
+        VALUES (#{comment.userId}, #{boardId}, #{comment.content})
+    </insert>
+</mapper>
