@@ -1,6 +1,22 @@
 .
-# 개발일지 - 2026년 6월 2일
+# 개발일지 - 2026년 6월 4일
 
+### ⭐ 즐겨찾기(Favorite) 기능 구현
+- 즐겨찾기 추가(`POST /favorite/{trackId}`), 삭제(`DELETE /favorite/{trackId}`),
+  존재 여부 확인(`GET /favorite/{trackId}`), 즐겨찾기한 경로 목록 조회(`GET /favorite/track`) 구현
+- JWT 토큰 기반으로 `@AuthenticationPrincipal`에서 userId 추출
+- MyBatis 매퍼(`FavoriteDao`)로 insert / delete / isExist / selectFavorites 쿼리 작성
+- 목록 조회 시 `tracks`와 `favorites` 조인, 서브쿼리로 `recommend_cnt`(추천 수) 함께 조회
+
+### 🧪 FavoriteController 테스트 작성
+- `@Order`로 insert → delete → 목록 조회 순서 제어
+- JWT 토큰 발급 후 `Authorization` 헤더로 인증 요청 검증
+- 테스트 작성 중 발견한 이슈 정리:
+  - `DataIntegrityViolationException`을 일괄 409(중복)로 처리하던 부분이,
+    실제로는 FK 제약 위반 등 다른 무결성 오류도 같은 메시지로 응답하던 문제 인지
+  - 목록 조회 테스트에서 GET 매핑 엔드포인트를 DELETE로 호출하던 실수 수정
+
+## 2026-06-02
 ## 작업 내용
 
 ### 🐛 버그 수정 - accessToken 파싱 오류 (황우찬)
