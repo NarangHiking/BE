@@ -38,4 +38,20 @@ public class BoardCommentController {
         BoardCommentResponse result = boardCommentService.insert(boardId, comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.success(result));
     }
+
+
+    @Operation(summary = "게시글의 댓글 수정", description = "boardId 게시글의 댓글을 수정하는 요청 처리")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "댓글 수정 실패, 필수 정보 누락"),
+            @ApiResponse(responseCode = "404", description = "댓글 수정 실패, 해당 댓글이 존재하지 않음"),
+            @ApiResponse(responseCode = "500", description = "댓글 수정 실패, 서버 문제")
+    })
+    @PatchMapping
+    public ResponseEntity<ApiResult<BoardCommentResponse>> update(
+            @Parameter(description = "댓글 수정에 필요한 내용", example = "BoardCommentRequest 참고")
+            @Valid @RequestBody BoardCommentRequest comment) {
+        BoardCommentResponse result = boardCommentService.update(comment);
+        return ResponseEntity.ok(ApiResult.success(result));
+    }
 }

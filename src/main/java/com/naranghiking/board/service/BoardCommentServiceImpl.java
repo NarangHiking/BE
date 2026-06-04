@@ -31,4 +31,12 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         if(result == 0) throw new RuntimeException("댓글 저장에 실패했습니다.");
         return selectById(comment.getId());
     }
+
+    @Transactional
+    @Override
+    public BoardCommentResponse update(BoardCommentRequest comment) {
+        selectById(comment.getId()); // 댓글이 존재하지 않으면 알아서 404
+        int result = boardCommentDao.update(comment);
+        return selectById(comment.getId());
+    }
 }
