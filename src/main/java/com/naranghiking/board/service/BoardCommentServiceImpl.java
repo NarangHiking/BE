@@ -37,6 +37,16 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     public BoardCommentResponse update(BoardCommentRequest comment) {
         selectById(comment.getId()); // 댓글이 존재하지 않으면 알아서 404
         int result = boardCommentDao.update(comment);
+        if(result == 0) throw new RuntimeException("댓글 수정에 실패했습니다.");
         return selectById(comment.getId());
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long commentId) {
+        selectById(commentId); // 댓글이 존재하지 않으면 알아서 404
+        int result = boardCommentDao.delete(commentId);
+        System.out.println(result);
+        if(result == 0) throw new RuntimeException("댓글 삭제에 실패했습니다.");
     }
 }

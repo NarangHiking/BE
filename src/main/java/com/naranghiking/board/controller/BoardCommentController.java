@@ -40,6 +40,7 @@ public class BoardCommentController {
     }
 
 
+
     @Operation(summary = "게시글의 댓글 수정", description = "boardId 게시글의 댓글을 수정하는 요청 처리")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
@@ -47,11 +48,29 @@ public class BoardCommentController {
             @ApiResponse(responseCode = "404", description = "댓글 수정 실패, 해당 댓글이 존재하지 않음"),
             @ApiResponse(responseCode = "500", description = "댓글 수정 실패, 서버 문제")
     })
-    @PatchMapping
+    @PatchMapping("/{commentId}")
     public ResponseEntity<ApiResult<BoardCommentResponse>> update(
+            @Parameter(description = "수정할 댓글의 ID", example = "1")
+            @PathVariable("commentId") Long commentId,
             @Parameter(description = "댓글 수정에 필요한 내용", example = "BoardCommentRequest 참고")
             @Valid @RequestBody BoardCommentRequest comment) {
+        comment.setId(commentId);
         BoardCommentResponse result = boardCommentService.update(comment);
         return ResponseEntity.ok(ApiResult.success(result));
+    }
+
+
+    @Operation(summary = "게시글의 댓글 삭제 요청 처리", description = "해당 게시글의 댓글을 삭제, 물리적이 아닌 논리적 삭제 적용")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "댓글 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "댓글 삭제 실패, 해당 댓글이 존재하지 않음"),
+            @ApiResponse(responseCode = "500", description = "댓글 삭제 실패, 서버 문제")
+    })
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<ApiResult<String>> delete(
+            @Parameter(description = "삭제할 댓글의 ID", example = "1")
+            @PathVariable("commentId") Long commentId) {
+        boardCommentService.delete(commentId);
+        return ResponseEntity.ok(ApiResult.success("성공적으로 삭제되었습니다."));
     }
 }
