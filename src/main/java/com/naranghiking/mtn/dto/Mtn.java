@@ -11,4 +11,6 @@ public class Mtn {
     private String location;
     private Integer height;
     private String description;
+    private String originalFilename;
+    private String storedFilename;
 }

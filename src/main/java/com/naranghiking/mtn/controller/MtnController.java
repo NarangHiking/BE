@@ -3,6 +3,8 @@ package com.naranghiking.mtn.controller;
 import com.naranghiking.common.dto.ApiResult;
 import com.naranghiking.mtn.dto.Mtn;
 import com.naranghiking.mtn.service.MtnService;
+import com.naranghiking.track.dto.Track;
+import com.naranghiking.track.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,9 @@ import java.util.List;
 @RequestMapping("/mtn")
 @RequiredArgsConstructor
 public class MtnController {
+
     private final MtnService mtnService;
+    private final TrackService trackService;
 
     @GetMapping("/list")
     public ResponseEntity<ApiResult> selectAll() {
@@ -31,6 +35,12 @@ public class MtnController {
             throw new RuntimeException("해당 번호의 산이 존재하지 않습니다.");
         }
         return ResponseEntity.ok(ApiResult.success(mtn));
+    }
+
+    @GetMapping("/{mtnId}/track")
+    public ResponseEntity<ApiResult> selectByMtnId(@PathVariable int mtnId) {
+        List<Track> li = trackService.selectByMtnId(mtnId);
+        return ResponseEntity.ok(ApiResult.success(li));
     }
 
     @PostMapping

@@ -7,16 +7,15 @@ import com.naranghiking.mtn.service.MtnService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
+@AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MtnControllerTest {
 
@@ -70,6 +69,15 @@ class MtnControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.name").value("테스트 산"));
+    }
+    @Test
+    @Order(2)
+    @DisplayName("산 추가 - 일반유저")
+    void userInsert() throws Exception {
+        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testMtn)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -146,13 +154,11 @@ class MtnControllerTest {
     }
 
     @Test
-    @Order(2)
-    @DisplayName("산 추가 - 일반유저")
-    void userInsert() throws Exception {
-        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testMtn)))
-                .andExpect(status().isForbidden());
+    @Order(8)
+    @DisplayName("산 하위 경로 표시")
+    void selectPathFromMtn() throws Exception {
+        mockMvc.perform(get("/mtn/1/track"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
-
 }
