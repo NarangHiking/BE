@@ -60,7 +60,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into tracks(mountain_id, name, gpx_file_path)
         values(#{mountainId}, #{name}, #{gpxFilePath})
     </insert>

@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.ObjectMapper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,10 +29,16 @@ class TrackControllerTest {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private String adminToken;
+    private static String adminToken;
+    private static Track track;
 
-    void setUpToken() {
-        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
+    @BeforeAll
+    static void setUp() {
+        track = new Track();
+        track.setId(1);
+        track.setMountainId(5);
+        track.setName("테스트 코스");
+        track.setGpxFilePath("/gpx/temp/test.gpx");
     }
 
     @Test
@@ -118,28 +125,24 @@ class TrackControllerTest {
     @DisplayName("경로 삽입")
     @Order(1)
     void insert() throws Exception {
-        setUpToken();
-        Track track = new Track();
-        track.setId(1);
-        track.setMountainId(5);
-        track.setName("테스트 코스");
-        track.setGpxFilePath("/gpx/temp/test.gpx");
-
-        mockMvc.perform(post("/track")
+        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
+        MvcResult result = mockMvc.perform(post("/track")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(track)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        String response = result.getResponse().getContentAsString();
+        Integer id = objectMapper.readTree(response).get("data").get("id").asInt();
+        track.setId(id);
     }
 
     @Test
     @DisplayName("경로 수정")
     @Order(2)
     void update() throws Exception {
-        setUpToken();
-        Track track = new Track();
-        track.setId(18);
+        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
         track.setMountainId(4);
         track.setName("수정된 코스");
         track.setGpxFilePath("/gpx/temp/updated.gpx");
@@ -158,8 +161,8 @@ class TrackControllerTest {
     @DisplayName("경로 삭제")
     @Order(3)
     void deleteTrack() throws Exception {
-        setUpToken();
-        mockMvc.perform(delete("/track/17")
+        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
+        mockMvc.perform(delete("/track/" + track.getId())
                         .header("Authorization", "Bearer " + adminToken)
                 )
                 .andExpect(status().isOk())
