@@ -10,10 +10,10 @@ public interface UserService {
 
     void insert(SignUpRequest request);
     User findByEmail(String email);      // 내부용 (pass 포함)
-    User findById(String userId);               // 내부용 (pass 포함)
-    UserResponse selectById(String userId);
+    User findById(Long userId);               // 내부용 (pass 포함)
+    UserResponse selectById(Long userId);
     public List<UserResponse> selectAll();
     public boolean checkPassword(String rawPassword, String encodedPassword);
 
-    void delete(String userId, String accessToken);
+    void delete(Long userId, String accessToken);
 }

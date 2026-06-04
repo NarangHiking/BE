@@ -12,11 +12,11 @@ public interface MtnDao {
 
     List<Mtn> selectByName(String name);
 
-    Mtn select(Integer id);
+    Mtn select(Long id);
 
     int insert(Mtn mtn);
 
     int update(Mtn mtn);
 
-    void delete(Integer id);
+    void delete(Long id);
 }

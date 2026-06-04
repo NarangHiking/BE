@@ -35,8 +35,8 @@ class TrackControllerTest {
     @BeforeAll
     static void setUp() {
         track = new Track();
-        track.setId(1);
-        track.setMountainId(5);
+        track.setId(1L);
+        track.setMountainId(5L);
         track.setName("테스트 코스");
         track.setGpxFilePath("/gpx/temp/test.gpx");
     }
@@ -125,7 +125,7 @@ class TrackControllerTest {
     @DisplayName("경로 삽입")
     @Order(1)
     void insert() throws Exception {
-        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
+        adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
         MvcResult result = mockMvc.perform(post("/track")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -134,7 +134,7 @@ class TrackControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String response = result.getResponse().getContentAsString();
-        Integer id = objectMapper.readTree(response).get("data").get("id").asInt();
+        Long id = objectMapper.readTree(response).get("data").get("id").asLong();
         track.setId(id);
     }
 
@@ -142,8 +142,8 @@ class TrackControllerTest {
     @DisplayName("경로 수정")
     @Order(2)
     void update() throws Exception {
-        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
-        track.setMountainId(4);
+        adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
+        track.setMountainId(4L);
         track.setName("수정된 코스");
         track.setGpxFilePath("/gpx/temp/updated.gpx");
 
@@ -161,7 +161,7 @@ class TrackControllerTest {
     @DisplayName("경로 삭제")
     @Order(3)
     void deleteTrack() throws Exception {
-        adminToken = jwtUtil.generateAccessToken("1", "ADMIN");
+        adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
         mockMvc.perform(delete("/track/" + track.getId())
                         .header("Authorization", "Bearer " + adminToken)
                 )

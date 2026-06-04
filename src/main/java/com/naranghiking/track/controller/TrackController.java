@@ -30,7 +30,7 @@ public class TrackController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResult> selectById(@PathVariable int id) {
+    public ResponseEntity<ApiResult> selectById(@PathVariable Long id) {
         Track track = trackService.selectById(id);
         if (track == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND) // UNAUTHORIZED → NOT_FOUND
@@ -56,7 +56,7 @@ public class TrackController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResult> delete(@PathVariable int id) {
+    public ResponseEntity<ApiResult> delete(@PathVariable Long id) {
         trackService.delete(id);
         return ResponseEntity.ok(ApiResult.success("ok"));
     }

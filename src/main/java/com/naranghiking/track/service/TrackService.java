@@ -7,17 +7,17 @@ import java.util.List;
 
 public interface TrackService {
 
-    List<Track> selectByMtnId(int mountainId);
+    List<Track> selectByMtnId(Long mountainId);
 
     List<Track> selectByName(String name);
 
     List<Track> selectByCondition(TrackCondition condition);
 
-    Track selectById(int id);
+    Track selectById(Long id);
 
     int insert(Track track);
 
     int update(Track track);
 
-    int delete(int id);
+    int delete(Long id);
 }

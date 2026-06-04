@@ -32,7 +32,7 @@ public class UserController {
 
     @GetMapping
     ResponseEntity<ApiResult> select(
-            @AuthenticationPrincipal String userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(ApiResult.success(userService.selectById(userId)));
     }
 
@@ -48,7 +48,7 @@ public class UserController {
     // => JWT 토큰에서 식별자(이메일) 추출해서 사용
     @PatchMapping
     ResponseEntity<ApiResult> update(
-            @AuthenticationPrincipal String userId,
+            @AuthenticationPrincipal Long userId,
             @RequestBody UpdateRequest request){
         userService.update(userId, request);
         return ResponseEntity.ok(ApiResult.success(null));
@@ -56,7 +56,7 @@ public class UserController {
 
     @PatchMapping("/remove")
     ResponseEntity<ApiResult> remove(
-            @AuthenticationPrincipal String userId,
+            @AuthenticationPrincipal Long userId,
             @RequestHeader("Authorization") String bearer
     ){
         userService.delete(userId, bearer.substring(7));

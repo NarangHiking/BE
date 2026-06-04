@@ -17,6 +17,6 @@ public class TokenResponse {
 	@Schema(description="리프레시 토큰", example="\"6f8902c3-4d5e-6f7a-8b9c...\"")
 	private String refreshToken;
 	
-	@Schema(description="사용자 아이디", example="0")
-	private String userId;
+	@Schema(description="사용자 아이디", example="0L")
+	private Long userId;
 }

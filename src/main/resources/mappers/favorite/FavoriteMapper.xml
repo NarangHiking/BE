@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naranghiking.favorite.dao.FavoriteDao">
+    <insert id="insert">
+        insert into favorites(user_id, track_id)
+        values(#{userId}, #{trackId})
+    </insert>
+
+    <delete id="delete">
+        delete from favorites
+        where user_id = #{userId}
+            and track_id = #{trackId}
+    </delete>
+
+    <select id="isExist" resultType="boolean">
+        select count(*) > 0
+        from favorites
+        where user_id = #{userId} and track_id = #{trackId}
+    </select>
+
+    <select id="selectFavorites">
+        select t.id, t.mountain_id, t.name, t.gpx_file_path,
+        (select count(*) from recommends where track_id = t.id) as recommend_cnt
+        from tracks t
+        join favorites f on f.user_id = #{userId} and f.track_id = t.id
+    </select>
+</mapper>

@@ -15,7 +15,7 @@ public class TrackServiceImpl implements TrackService{
     private final TrackDao trackDao;
 
     @Override
-    public List<Track> selectByMtnId(int mountainId) {
+    public List<Track> selectByMtnId(Long mountainId) {
         return trackDao.selectByMtnId(mountainId);
     }
 
@@ -30,7 +30,7 @@ public class TrackServiceImpl implements TrackService{
     }
 
     @Override
-    public Track selectById(int id) {
+    public Track selectById(Long id) {
         return trackDao.selectById(id);
     }
 
@@ -45,7 +45,7 @@ public class TrackServiceImpl implements TrackService{
     }
 
     @Override
-    public int delete(int id) {
+    public int delete(Long id) {
         return trackDao.delete(id);
     }
 }

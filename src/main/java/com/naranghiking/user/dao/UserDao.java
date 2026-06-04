@@ -13,15 +13,15 @@ public interface UserDao {
     List<User> selectAll();
     
     // email로 유저 조회
-    User select(String userId);
+    User select(Long userId);
 
     User findByEmail(String email);
 
-    User findById(String userId);
+    User findById(Long userId);
 
     int insert(SignUpRequest request);
 
     int update(UpdateRequest request);
 
-    void delete(String userId);
+    void delete(Long userId);
 }

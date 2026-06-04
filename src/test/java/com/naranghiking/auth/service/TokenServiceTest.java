@@ -45,7 +45,7 @@ class TokenServiceTest {
     void saveRefreshToken() {
     	when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(jwtUtil.getRemainExpiration(anyString())).thenReturn(604800000L);
-        tokenService.saveRefreshToken("123", "refreshToken");
+        tokenService.saveRefreshToken(123L, "refreshToken");
         verify(valueOperations).set("RT:123", "refreshToken", 604800000L, TimeUnit.MILLISECONDS);
     }
 
@@ -57,13 +57,13 @@ class TokenServiceTest {
         // verify(redisTemplate).delete는 메서드가 2개라서 (String)을 명시해주어야 함
         // .delete(String)
         // .delete(Collection<String>)
-        assertEquals("refreshToken", tokenService.getRefreshToken((String)"123"));
+        assertEquals("refreshToken", tokenService.getRefreshToken(123L));
     }
 
     @Test
     @DisplayName("Refresh Token 삭제")
     void deleteRefreshToken() {
-        tokenService.deleteRefreshToken("123");
+        tokenService.deleteRefreshToken(123L);
         verify(redisTemplate).delete(eq("RT:123"));
     }
 
