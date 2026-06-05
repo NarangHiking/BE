@@ -4,6 +4,7 @@ import com.naranghiking.board.dao.BoardCommentDao;
 import com.naranghiking.board.dto.BoardCommentRequest;
 import com.naranghiking.board.dto.BoardCommentResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,11 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     @Transactional
     @Override
     public BoardCommentResponse update(BoardCommentRequest comment) {
-        selectById(comment.getId()); // 댓글이 존재하지 않으면 알아서 404
+        BoardCommentResponse selected = selectById(comment.getId()); // 댓글이 존재하지 않으면 알아서 404
+        if(selected.getUserId() != comment.getUserId()) { // userId 불일치 > 403 에러
+            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
+        }
+
         int result = boardCommentDao.update(comment);
         if(result == 0) throw new RuntimeException("댓글 수정에 실패했습니다.");
         return selectById(comment.getId());
@@ -43,8 +48,12 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
     @Transactional
     @Override
-    public void delete(Long commentId) {
-        selectById(commentId); // 댓글이 존재하지 않으면 알아서 404
+    public void delete(Long commentId, Long userId) {
+        BoardCommentResponse selected = selectById(commentId); // 댓글이 존재하지 않으면 알아서 404
+        if(selected.getUserId() != userId) { // userId 불일치 > 403 에러
+            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
+        }
+
         int result = boardCommentDao.delete(commentId);
         System.out.println(result);
         if(result == 0) throw new RuntimeException("댓글 삭제에 실패했습니다.");
