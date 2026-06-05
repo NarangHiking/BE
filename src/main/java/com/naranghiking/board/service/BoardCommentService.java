@@ -12,5 +12,5 @@ public interface BoardCommentService {
     // 댓글 수정
     BoardCommentResponse update(@Valid BoardCommentRequest comment);
     // 댓글 삭제(논리적)
-    void delete(Long commentId);
+    void delete(Long commentId, Long userId);
 }

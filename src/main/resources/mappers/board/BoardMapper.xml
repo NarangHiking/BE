@@ -69,6 +69,7 @@
                DATE_FORMAT(bc.created_at, '%Y년%m월%d일, %H시%i분') AS created_at
           FROM board_comments bc JOIN users u ON bc.user_id = u.id
          WHERE board_id = #{id}
+           AND bc.deleted_at IS NULL
          ORDER BY bc.id DESC
     </select>
 <!--  게시글 생성  -->

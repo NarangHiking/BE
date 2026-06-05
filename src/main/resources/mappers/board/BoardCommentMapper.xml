@@ -5,9 +5,10 @@
 <mapper namespace="com.naranghiking.board.dao.BoardCommentDao">
 <!--  댓글 조회  -->
     <select id="selectById" resultType="BoardCommentResponse">
-        SELECT bc.id, u.name, bc.content, bc.created_at
+        SELECT bc.id, bc.user_id, u.name, bc.content, bc.created_at
           FROM board_comments bc JOIN users u ON bc.user_id = u.id
          WHERE bc.id = #{id}
+           AND bc.deleted_at IS NULL
     </select>
 <!--  댓글 작성  -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="comment.id">

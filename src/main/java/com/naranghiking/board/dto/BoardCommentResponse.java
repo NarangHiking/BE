@@ -13,6 +13,9 @@ public class BoardCommentResponse {
     @Schema(description = "댓글의 ID, 해당 댓글을 선택할 때 필요", example = "1")
     private Long id;
 
+    @Schema(description = "댓글 작성자의 ID", example = "1")
+    private Long userId;
+
     @Schema(description = "댓글의 작성자", example = "김수한무")
     private String name;
 
