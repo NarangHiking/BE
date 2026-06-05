@@ -4,6 +4,7 @@ import com.naranghiking.auth.dto.LoginRequest;
 import com.naranghiking.auth.dto.TokenResponse;
 import com.naranghiking.common.exception.UserNotFoundException;
 import com.naranghiking.common.util.JwtUtil;
+import com.naranghiking.user.dto.SignUpRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +23,14 @@ class AuthServiceIntegrationTest {
 
     @Autowired
     private TokenService tokenService;
+
+    @Test
+    void register() {
+        //given
+        SignUpRequest request = new SignUpRequest("a@a.com", "ssafy", "Hong");
+        //when
+
+    }
 
     @Test
     void login_success() {
