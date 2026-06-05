@@ -41,7 +41,7 @@ public class AuthController {
         @ApiResponse(responseCode="401", description="비밀번호가 일치하지 않습니다."),
     })
     @PostMapping("/login")
-    ResponseEntity<ApiResult<TokenResponse>> login(@RequestBody LoginRequest request) {
+    ResponseEntity<ApiResult> login(@RequestBody LoginRequest request) {
     	TokenResponse data = service.login(request);
         return ResponseEntity.ok(ApiResult.success(data));
     }
@@ -51,13 +51,13 @@ public class AuthController {
     	@ApiResponse(responseCode="200", description="로그아웃 성공"),
     })
     @PostMapping("/logout")
-    ResponseEntity<ApiResult<Void>> logout(
+    ResponseEntity<ApiResult> logout(
     		@Parameter(hidden = true)
     		@AuthenticationPrincipal Long userId ,
     		@RequestHeader("Authorization") String bearer) {
     	String token = bearer.substring(7);
     	service.logout(userId, token);
-    	return ResponseEntity.ok(ApiResult.success(null));
+    	return ResponseEntity.ok(ApiResult.success("ok"));
     }
       
     @Operation(summary = "토큰 재발급", description = "access token을 재발급하기 위해 refresh token을 발급합니다.")
@@ -67,7 +67,7 @@ public class AuthController {
     })
     
     @PostMapping("/reissue")
-    ResponseEntity<ApiResult<TokenResponse>> reissue(@RequestBody Map<String, String> body) {
+    ResponseEntity<ApiResult> reissue(@RequestBody Map<String, String> body) {
     	
     	String refreshToken = body.get("refreshToken");
     	TokenResponse data = service.reissue(refreshToken);

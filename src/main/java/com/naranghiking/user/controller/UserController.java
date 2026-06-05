@@ -22,7 +22,6 @@ import java.util.List;
 public class UserController {
 
     private final UserServiceImpl userService;
-    private final AuthService authService;
 
     @GetMapping("/list")
     ResponseEntity<ApiResult> selectAll() {
@@ -51,7 +50,7 @@ public class UserController {
             @AuthenticationPrincipal Long userId,
             @RequestBody UpdateRequest request){
         userService.update(userId, request);
-        return ResponseEntity.ok(ApiResult.success(null));
+        return ResponseEntity.ok(ApiResult.success("ok"));
     }
 
     @PatchMapping("/remove")
@@ -60,6 +59,6 @@ public class UserController {
             @RequestHeader("Authorization") String bearer
     ){
         userService.delete(userId, bearer.substring(7));
-        return ResponseEntity.ok(ApiResult.success(null));
+        return ResponseEntity.ok(ApiResult.success("ok"));
     }
 }
