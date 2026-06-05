@@ -39,12 +39,13 @@
             <if test="category != null"> <!--카테고리로 탐색-->
                 AND (category = #{category})
             </if>
+            AND b.deleted_at IS NULL
         </where>
          ORDER BY b.id DESC
     </select>
 <!--  게시글 단건 조회  -->
     <select id="selectById" resultMap="BoardDetailMap">
-        SELECT b.id, u.name, b.track_id, b.title, b.content, b.category,
+        SELECT b.id, b.user_id, u.name, b.track_id, b.title, b.content, b.category,
                -- 날짜 포맷
                DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
                -- 댓글 수
@@ -53,6 +54,7 @@
                 WHERE bc.board_id = b.id) AS comment_count
           FROM boards b JOIN users u ON b.user_id = u.id
          WHERE b.id = #{id}
+           AND b.deleted_at IS NULL
     </select>
     <!--  게시글 단건 조회에 필요한 이미지들 가져오기  -->
     <select id="selectImagesByBoardId" resultType="String">

@@ -9,13 +9,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardDetailResponse {
-    @Schema(description = "게시글의 ID, 해당 게시글을 선택할 때 필요", example = "1")
+    @Schema(description = "게시글의 ID, 해당 게시글을 선택할 때 필요", example = "1L")
     private Long id;
+
+    @Schema(description = "게시글 작성자의 ID, 유효성 검사를 위해", example = "2L")
+    private Long userId;
 
     @Schema(description = "게시글 작성자, 해당 게시글의 작성자 표시", example = "김수한무")
     private String name;
 
-    @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1")
+    @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1L")
     private Long trackId;
 
     @Schema(description = "게시글의 제목", example = "오늘의 등산 코스")

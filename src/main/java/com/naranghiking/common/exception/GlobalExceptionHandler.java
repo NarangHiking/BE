@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.naranghiking.common.dto.ApiResult;
 
+import java.nio.file.AccessDeniedException;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -61,9 +62,16 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(RuntimeException.class) // 그 외의 Transactional을 위해 예외를 던질 경우
 	public ResponseEntity<ApiResult<Void>> handleRuntimeExceptions(RuntimeException e) {
-		log.error("RuntimeException 발생: " + e);
+        log.error("RuntimeException 발생: {}", String.valueOf(e));
 		return ResponseEntity
 				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(ApiResult.fail(e.getMessage()));
+	}
+
+	@ExceptionHandler(AccessDeniedException.class) // 권한이 없을 경우, 접근 디나이
+	public ResponseEntity<ApiResult<Void>> handleAccessDeniedExceptions(AccessDeniedException e) {
+		return ResponseEntity
+				.status(HttpStatus.FORBIDDEN)
 				.body(ApiResult.fail(e.getMessage()));
 	}
 }

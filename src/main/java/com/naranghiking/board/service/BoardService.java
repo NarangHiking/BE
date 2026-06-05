@@ -18,5 +18,5 @@ public interface BoardService {
     // 게시글 수정
     BoardDetailResponse update(Long id, BoardRequest board, List<MultipartFile> addedImages, List<String> deletedImages);
     // 게시글 삭제
-    void deleteById(Long id);
+    void deleteById(Long id, Long userId);
 }
