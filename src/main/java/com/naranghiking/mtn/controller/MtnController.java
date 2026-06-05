@@ -73,6 +73,6 @@ public class MtnController {
             @PathVariable Long id
     ) {
         mtnService.delete(id);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResult.success(null));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResult.success("ok"));
     }
 }
