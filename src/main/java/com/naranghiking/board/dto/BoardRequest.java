@@ -2,7 +2,6 @@ package com.naranghiking.board.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Schema(description = "게시글 작성에 필요한 DTO")
@@ -16,7 +15,6 @@ public class BoardRequest {
     private Long id;
 
     @Schema(description = "사용자 ID, 반드시 필요", example = "1")
-    @NotNull
     private Long userId;
 
     @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1")

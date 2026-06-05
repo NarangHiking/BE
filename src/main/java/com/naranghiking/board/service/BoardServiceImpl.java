@@ -7,6 +7,7 @@ import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.common.dto.ImageRequest;
 import com.naranghiking.common.service.FileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,8 +57,10 @@ public class BoardServiceImpl implements BoardService {
     @Transactional // 실패하면 롤백
     @Override
     public BoardDetailResponse update(Long id, BoardRequest board, List<MultipartFile> addedImages, List<String> deletedImages) {
-        selectById(id); // null이면 알아서 에러 처리됨
-
+        BoardDetailResponse selected = selectById(id); // null이면 알아서 에러 처리됨
+        if(selected.getUserId() != board.getUserId()) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생
+            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 게시글만 수정이 가능합니다.");
+        }
         // 게시글 수정
         int result = boardDao.update(id, board);
         if(result == 0) throw new RuntimeException("게시글 수정 중 오류 발생");
@@ -81,8 +84,11 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional // 실패하면 롤백
     @Override
-    public void deleteById(Long id) {
-        selectById(id);
+    public void deleteById(Long id, Long userId) {
+        BoardDetailResponse selected = selectById(id);
+        if(selected.getUserId() != userId) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생
+            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 게시글만 수정이 가능합니다.");
+        }
 
         int result = boardDao.deleteById(id);
         if(result == 0) throw new RuntimeException("게시글 삭제 중 오류 발생");
