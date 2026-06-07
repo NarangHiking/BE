@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth-> auth
                         .requestMatchers(permitUrls).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/mtn/**", "/track/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/mtn/**", "/track/**", "/weather/**", "/sun/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
                         .requestMatchers(HttpMethod.GET, "/user/list").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, adminUrls).hasRole("ADMIN")
