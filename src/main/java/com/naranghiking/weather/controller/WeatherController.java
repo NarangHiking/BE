@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("/weather")
+@RequestMapping("/api/weather")
 @RequiredArgsConstructor
 public class WeatherController {
 

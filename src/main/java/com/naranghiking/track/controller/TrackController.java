@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/track")
+@RequestMapping("/api/track")
 public class TrackController {
     private final TrackService trackService;
 

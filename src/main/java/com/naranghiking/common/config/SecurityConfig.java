@@ -29,16 +29,16 @@ public class SecurityConfig {
 
     String [] permitUrls = {
             "/api/auth/login",
-            "/user/register",
-            "/error",
-            "/board/**",
+            "/api/user/register",
+            "/api/error",
+            "/api/board/**",
             "/swagger-ui/**",
             "/v3/api-docs/**"
     };
 
     String [] adminUrls = {
-            "/mtn/**",
-            "/tracks/**"
+            "/api/mtn/**",
+            "/api/tracks/**"
     };
 
     @Bean
@@ -64,9 +64,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth-> auth
                         .requestMatchers(permitUrls).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/mtn/**", "/track/**", "/weather/**", "/sun/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/list").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/mtn/**", "/api/track/**", "/api/weather/**", "/api/sun/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user/list").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, adminUrls).hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, adminUrls).hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, adminUrls).hasRole("ADMIN")

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/sun")
+@RequestMapping("/api/sun")
 public class SuntimeController {
 
     private final SuntimeService suntimeService;

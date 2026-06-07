@@ -25,7 +25,7 @@ import java.util.Objects;
 
 @Tag(name = "게시글과 관련된 컨트롤러")
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/api/board")
 @RequiredArgsConstructor
 public class BoardController {
 

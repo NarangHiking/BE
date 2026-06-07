@@ -33,7 +33,7 @@ class RecommendControllerTest {
     @Order(1)
     @DisplayName("경로 추천 추가")
     public void insert() throws Exception {
-        mockMvc.perform(post("/recommend/2")
+        mockMvc.perform(post("/api/recommend/2")
                         .header("Authorization", "Bearer " + userToken))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -43,7 +43,7 @@ class RecommendControllerTest {
     @Order(2)
     @DisplayName("경로 추천 중복")
     public void insert_fail() throws Exception {
-        mockMvc.perform(post("/recommend/2")
+        mockMvc.perform(post("/api/recommend/2")
                         .header("Authorization", "Bearer " + userToken))
                 .andDo(print())
                 .andExpect(status().isConflict());
@@ -53,7 +53,7 @@ class RecommendControllerTest {
     @Order(3)
     @DisplayName("추천 누른 경로 보여주기")
     public void selectFavorites() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/recommend/track")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommend/track")
                         .header("Authorization", "Bearer " + userToken))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -63,7 +63,7 @@ class RecommendControllerTest {
     @Order(4)
     @DisplayName("경로 추천 삭제")
     public void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/recommend/2")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/recommend/2")
                         .header("Authorization", "Bearer " + userToken))
                 .andDo(print())
                 .andExpect(status().isOk());

@@ -46,7 +46,7 @@ class UserControllerTest {
     @DisplayName("전체 유저 조회")
     void selectAll() throws Exception {
         adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
-        mockMvc.perform(get("/user/list")
+        mockMvc.perform(get("/api/user/list")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -56,7 +56,7 @@ class UserControllerTest {
     @DisplayName("회원가입")
     @Order(1)
     void register() throws Exception {
-        mockMvc.perform(post("/user")
+        mockMvc.perform(post("/api/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signUpRequest)))
                 .andExpect(status().isCreated())
@@ -70,7 +70,7 @@ class UserControllerTest {
     @Order(2)
     void select() throws Exception {
         userToken = jwtUtil.generateAccessToken(1L, "USER");
-        mockMvc.perform(get("/user")
+        mockMvc.perform(get("/api/user")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
@@ -86,7 +86,7 @@ class UserControllerTest {
         updateRequest.setPass("newpass1234");
         updateRequest.setName("수정된유저");
 
-        mockMvc.perform(patch("/user")
+        mockMvc.perform(patch("/api/user")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
@@ -101,7 +101,7 @@ class UserControllerTest {
     @Order(4)
     void remove() throws Exception {
         userToken = jwtUtil.generateAccessToken(1L, "USER");
-        mockMvc.perform(patch("/user/remove")
+        mockMvc.perform(patch("/api/user/remove")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
