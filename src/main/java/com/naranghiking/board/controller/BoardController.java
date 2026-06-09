@@ -73,7 +73,6 @@ public class BoardController {
             @Valid @RequestPart("board") BoardRequest board,
             @Parameter(description = "게시글에 첨부된 이미지", example = "이미지1, 이미지2")
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        System.out.println(userId);
         board.setUserId(userId);
         boardService.insert(board, images);
         // 새롭게 생성된 게시글 전달

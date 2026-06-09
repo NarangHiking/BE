@@ -12,7 +12,7 @@
             <id column="stored_filename" property="storedFilename"/>
         </collection>
     </resultMap>
-
+<!--  한 코스에 대한 전체 후기 조회  -->
     <select id="selectAll" resultMap="commentListMap">
         SELECT tc.id, tc.user_id, u.name, tc.content,
                DATE_FORMAT(tc.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
@@ -24,4 +24,17 @@
          WHERE tc.track_id = #{trackId} AND tc.deleted_at IS NULL
          ORDER BY id DESC
     </select>
+<!--  코스 후기 저장  -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO track_comments (user_id, track_id, content)
+        VALUES (#{userId}, #{trackId}, #{content})
+    </insert>
+<!--  코스 후기에 이미지가 있을 경우 저장  -->
+    <insert id="insertImages">
+        INSERT INTO track_comment_images (comment_id, original_filename, stored_filename)
+        VALUES
+            <foreach collection="images" item="image" separator=",">
+                (#{id}, #{image.originalFilename}, #{image.storedFilename})
+            </foreach>
+    </insert>
 </mapper>
