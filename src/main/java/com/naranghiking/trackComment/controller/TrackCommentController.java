@@ -74,9 +74,19 @@ public class TrackCommentController {
 
 
     @Operation(summary = "코스 후기 삭제", description = "코스 후기를 논리적으로 삭제하는 요청 처리")
-    @DeleteMapping
-    public ResponseEntity<ApiResult<Void>> delete() {
-
-        return ResponseEntity.ok(null);
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "코스 후기 삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "코스 후기 삭제 실패, 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "코스 후기 삭제 실패, 해당 id로 게시글을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "코스 후기 삭제 실패, 서버 문제")
+    })
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<ApiResult<String>> delete(
+            @Parameter(description = "작성자의 ID", example = "1L")
+            @AuthenticationPrincipal Long userId,
+            @Parameter(description = "삭제할 후기의 ID", example = "1L")
+            @PathVariable("commentId") Long commentId) {
+        trackCommentService.delete(userId, commentId);
+        return ResponseEntity.ok(ApiResult.success("성공적으로 삭제했습니다."));
     }
 }
