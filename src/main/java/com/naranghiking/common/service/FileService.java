@@ -24,6 +24,7 @@ public class FileService {
         String path = "";
         // pivot이 board인 경우에는 게시글에서 넘어온 이미지
         if(pivot.equals("board")) path = "boardImages";
+        if(pivot.equals(("trackComment"))) path = "trackCommentImages";
 
         File dir = new File(imagesDir + path);
         if(!dir.exists()) dir.mkdirs(); // 경로에 폴더가 없으면 생성

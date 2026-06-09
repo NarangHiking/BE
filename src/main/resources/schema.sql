@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS board_images;
 DROP TABLE IF EXISTS board_comments;
+DROP TABLE IF EXISTS track_comment_images;
+DROP TABLE IF EXISTS track_comments;
 -- track, user에 의존하는 테이블
 DROP TABLE IF EXISTS boards;
 DROP TABLE IF EXISTS favorites;
@@ -93,4 +95,26 @@ CREATE TABLE IF NOT EXISTS board_comments (
 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS track_comments (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+       user_id BIGINT NOT NULL,
+      track_id BIGINT DEFAULT NULL,
+       content VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT NULL,
+    deleted_at TIMESTAMP DEFAULT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (track_id) REFERENCES tracks(id)
+);
+
+CREATE TABLE IF NOT EXISTS track_comment_images (
+                   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+           comment_id BIGINT NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+      stored_filename VARCHAR(255) NOT NULL,
+
+    FOREIGN KEY (comment_id) REFERENCES track_comments(id) ON DELETE CASCADE
 );

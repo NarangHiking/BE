@@ -69,8 +69,6 @@ VALUES (1, "등산", "테스트", "free");
 INSERT INTO boards(user_id, track_id, title, content, category)
 VALUES (2, 3, "게시글", "이번에는 건의", "feedback");
 
-select * from boards;
-
 -- 게시글 이미지 더미 데이터
 INSERT INTO board_images(board_id, original_filename, stored_filename)
 VALUES (1, "sample1.jpg", "sample1.jpg");
@@ -79,3 +77,11 @@ VALUES (1, "sample1.jpg", "sample1.jpg");
 INSERT INTO board_comments(user_id, board_id, content)
 VALUES (1, 1, "댓글 작성합니다."),
        (1, 1, "두 번째 댓글입니다.");
+
+INSERT INTO track_comments(user_id, track_id, content)
+VALUES (1, 1, "이 코스 적극 추천합니다!!"),
+       (2, 1, "저한테는 이 코스가 조금 힘들었어요. 그리고 벌레 조심하세요.");
+
+INSERT INTO track_comment_images(comment_id, original_filename, stored_filename)
+VALUES (1, "원본1", "저장1"),
+       (1, "원본2", "저장2")

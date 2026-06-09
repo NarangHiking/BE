@@ -32,7 +32,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @Operation(summary = "게시글 전체 조회", description = "전체 게시글을 조회합니다. 때로는 각각의 파라미터에 맞춰, 제목, 내용, 카테고리로도 조회가 가능합니다.")
-    @ApiResponse(responseCode = "200",description = "조회 성공")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping // 게시글 전체(키워드, 카테고리) 조회
     public ResponseEntity<ApiResult<List<BoardListResponse>>> list(
             @Parameter(description = "제목 및 내용 검색", example = "오늘은") @RequestParam(value = "keyword", required = false) String keyword,
@@ -73,7 +73,6 @@ public class BoardController {
             @Valid @RequestPart("board") BoardRequest board,
             @Parameter(description = "게시글에 첨부된 이미지", example = "이미지1, 이미지2")
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        System.out.println(userId);
         board.setUserId(userId);
         boardService.insert(board, images);
         // 새롭게 생성된 게시글 전달
