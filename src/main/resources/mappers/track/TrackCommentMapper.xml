@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naranghiking.trackComment.dao.TrackCommentDao">
+    <resultMap id="commentListMap" type="TrackCommentListResponse" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="created_at" property="createdAt"/>
+
+        <collection property="images" ofType="com.naranghiking.common.dto.ImageResponse" autoMapping="true">
+            <id column="stored_filename" property="storedFilename"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAll" resultMap="commentListMap">
+        SELECT tc.id, tc.user_id, u.name, tc.content,
+               DATE_FORMAT(tc.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
+               -- 이미지들
+               tci.original_filename, tci.stored_filename
+          FROM track_comments tc
+          JOIN users u ON tc.user_id = u.id
+          LEFT JOIN track_comment_images tci ON tc.id = tci.comment_id
+         WHERE tc.track_id = #{trackId} AND tc.deleted_at IS NULL
+         ORDER BY id DESC
+    </select>
+</mapper>

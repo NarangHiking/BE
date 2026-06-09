@@ -1,8 +1,9 @@
 package com.naranghiking.board.dto;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Schema(description = "게시글 전체 조회를 위한 DTO")
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class BoardListResponse {
     @Schema(description = "게시글의 카테고리, 자유 또는 건의사항", example = "free or feedback")
     private String category;
 
-    @Schema(description = "게시글의 이미지, 대표 이미지로 한 장만 표시", example = "/images/")
+    @Schema(description = "게시글의 이미지, 대표 이미지로 한 장만 표시", example = "이미지1")
     private String image;
 
     @Schema(description = "게시글 생성일", example = "2026년06월01일, 22시36분")
