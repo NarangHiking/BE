@@ -12,6 +12,12 @@
             <id column="stored_filename" property="storedFilename"/>
         </collection>
     </resultMap>
+<!--  후기 한 건만 조회해서 userId 반환  -->
+    <select id="selectById" resultType="Long">
+        SELECT user_id
+          FROM track_comments
+         WHERE id = #{commentId}
+    </select>
 <!--  한 코스에 대한 전체 후기 조회  -->
     <select id="selectAll" resultMap="commentListMap">
         SELECT tc.id, tc.user_id, u.name, tc.content,
@@ -37,4 +43,10 @@
                 (#{id}, #{image.originalFilename}, #{image.storedFilename})
             </foreach>
     </insert>
+<!--  후기 논리적 삭제  -->
+    <delete id="delete">
+        UPDATE track_comments
+           SET deleted_at = DEFAULT
+         WHERE id = #{commentId}
+    </delete>
 </mapper>
