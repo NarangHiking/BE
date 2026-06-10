@@ -65,6 +65,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth-> auth
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(permitUrls).permitAll()
                         .requestMatchers(HttpMethod.GET, "/mtn/**", "/track/**", "/weather/**", "/sun/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()

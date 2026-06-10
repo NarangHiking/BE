@@ -66,8 +66,10 @@ public class TrackCommentController {
 
 
     @Operation(summary = "코스 후기 수정", description = "코스 후기를 수정하는 요청 처리")
-    @PutMapping
-    public ResponseEntity<ApiResult<Void>> update() {
+    @PutMapping("/{commentId}")
+    public ResponseEntity<ApiResult<Void>> update(
+
+    ) {
 
         return ResponseEntity.ok(null);
     }
@@ -76,6 +78,7 @@ public class TrackCommentController {
     @Operation(summary = "코스 후기 삭제", description = "코스 후기를 논리적으로 삭제하는 요청 처리")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "코스 후기 삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "코스 후기 삭제 실패, 유효하지 않은 토큰"),
             @ApiResponse(responseCode = "403", description = "코스 후기 삭제 실패, 권한 없음"),
             @ApiResponse(responseCode = "404", description = "코스 후기 삭제 실패, 해당 id로 게시글을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "코스 후기 삭제 실패, 서버 문제")
