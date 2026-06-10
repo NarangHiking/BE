@@ -51,6 +51,33 @@ public class TrackCommentServiceImpl implements TrackCommentService {
 
     @Transactional
     @Override
+    public void update(TrackCommentRequest comment, List<MultipartFile> addedImages, List<String> deletedImages) {
+        // getId로 해당 후기의 작성자 ID 가져오기
+        Long selected = selectById(comment.getId());
+        if(selected == null || !selected.equals(comment.getUserId())) { // 작성자와 수정자가 다르면 403 에러
+            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 후기만 수정 가능합니다.");
+        }
+        // 업데이트 수행
+        int result = trackCommentDao.update(comment);
+        if(result == 0) throw new RuntimeException("후기 수정 중 오류 발생");
+        // 새로운 이미지 저장
+        if(addedImages != null && !addedImages.isEmpty()) {
+            List<ImageRequest> saveImages = fileService.saveFiles(addedImages, "trackComment");
+
+            if(!saveImages.isEmpty()) {
+                trackCommentDao.insertImages(comment.getId(), saveImages);
+            }
+        }
+        // 기존 이미지 삭제
+        if(deletedImages != null && !deletedImages.isEmpty()) {
+            fileService.deleteFiles(deletedImages, "trackComment");
+            // DB에서도 삭제
+            trackCommentDao.deleteImages(deletedImages);
+        }
+    }
+
+    @Transactional
+    @Override
     public void delete(Long userId, Long commentId) {
         // commentId로 후기 가져오기
         Long selected = selectById(commentId);

@@ -66,21 +66,38 @@ public class TrackCommentController {
 
 
     @Operation(summary = "코스 후기 수정", description = "코스 후기를 수정하는 요청 처리")
-    @PutMapping
-    public ResponseEntity<ApiResult<Void>> update() {
+    @PutMapping("/{commentId}") // 후기 수정
+    public ResponseEntity<ApiResult<String>> update(
+            @Parameter(description = "작성자의 ID", example = "1L")
+            @AuthenticationPrincipal Long userId,
 
-        return ResponseEntity.ok(null);
+            @Parameter(description = "수정할 후기의 ID", example = "1L")
+            @PathVariable("commentId") Long commentId,
+
+            @Parameter(description = "후기의 내용", example = "TrackCommentRequest 참고")
+            @Valid @RequestPart("comment") TrackCommentRequest comment,
+
+            @Parameter(description = "새롭게 첨부된 이미지", example = "이미지1, 이미지2")
+            @RequestPart(value = "addedImages", required = false) List<MultipartFile> addedImages,
+
+            @Parameter(description = "삭제될 이미지들", example = "이미지1, 이미지2")
+            @RequestParam(value = "deletedImages", required = false) List<String> deletedImages) {
+        comment.setUserId(userId);
+        comment.setId(commentId);
+        trackCommentService.update(comment, addedImages, deletedImages);
+        return ResponseEntity.ok(ApiResult.success("수정 완료"));
     }
 
 
     @Operation(summary = "코스 후기 삭제", description = "코스 후기를 논리적으로 삭제하는 요청 처리")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "코스 후기 삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "코스 후기 삭제 실패, 유효하지 않은 토큰"),
             @ApiResponse(responseCode = "403", description = "코스 후기 삭제 실패, 권한 없음"),
             @ApiResponse(responseCode = "404", description = "코스 후기 삭제 실패, 해당 id로 게시글을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "코스 후기 삭제 실패, 서버 문제")
     })
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/{commentId}") // 후기 삭제
     public ResponseEntity<ApiResult<String>> delete(
             @Parameter(description = "작성자의 ID", example = "1L")
             @AuthenticationPrincipal Long userId,

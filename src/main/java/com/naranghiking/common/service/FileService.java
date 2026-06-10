@@ -57,6 +57,7 @@ public class FileService {
         String path = "";
         // pivot이 board인 경우에는 게시글에서 넘어온 이미지
         if(pivot.equals("board")) path = "boardImages";
+        if(pivot.equals(("trackComment"))) path = "trackCommentImages";
 
         File dir = new File(imagesDir + path);
 

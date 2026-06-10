@@ -16,4 +16,6 @@ public interface TrackCommentService {
     void insert(@Valid TrackCommentRequest comment, List<MultipartFile> images);
     // 후기 삭제
     void delete(Long userId, Long commentId);
+    // 후기 수정
+    void update(@Valid TrackCommentRequest comment, List<MultipartFile> addedImages, List<String> deletedImages);
 }

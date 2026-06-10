@@ -75,7 +75,7 @@ public class BoardServiceImpl implements BoardService {
         // 기존 이미지 삭제
         if(deletedImages != null && !deletedImages.isEmpty()) {
             fileService.deleteFiles(deletedImages, "board");
-            // DB에서도 삭제해
+            // DB에서도 삭제
             boardDao.deleteImages(deletedImages);
         }
 

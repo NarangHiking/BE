@@ -43,13 +43,16 @@ public class JwtFilter extends OncePerRequestFilter {
 		// 블랙리스트 확인 || 만료 확인
         try {
             if (tokenService.isBlacklisted(token) || jwtUtil.isExpired(token)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+				throw new org.springframework.security.authentication.BadCredentialsException("유효하지 않은 토큰입니다.");
             }
-        } catch (Exception e) {
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setContentType("application/json;charset=UTF-8");
+			response.getWriter().write("{\"success\":false,\"response\":null,\"error\":{\"message\":\"토큰이 만료되었습니다.\",\"status\":401}}");
+			return;
+		} catch (Exception e) {
             // 파싱 자체가 실패한 경우 (RS256, 변조된 토큰 등)
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+			throw new org.springframework.security.authentication.BadCredentialsException("토큰 인증 실패");
         }
 		
 		Long userId= jwtUtil.getUserId(token);
@@ -59,7 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         // JWT 토큰에서 userID 추출 => Spring Security에 등록,
-		UsernamePasswordAuthenticationToken authentication = 
+		UsernamePasswordAuthenticationToken authentication =
 				new UsernamePasswordAuthenticationToken(userId, null, authorities);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		filterChain.doFilter(request, response);
