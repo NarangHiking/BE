@@ -16,11 +16,11 @@
     <select id="selectById" resultType="Long">
         SELECT user_id
           FROM track_comments
-         WHERE id = #{commentId}
+         WHERE id = #{commentId} AND deleted_at IS NULL
     </select>
 <!--  한 코스에 대한 전체 후기 조회  -->
     <select id="selectAll" resultMap="commentListMap">
-        SELECT tc.id, tc.user_id, u.name, tc.content,
+        SELECT tc.id AS id, tc.user_id, u.name, tc.content,
                DATE_FORMAT(tc.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
                -- 이미지들
                tci.original_filename, tci.stored_filename
@@ -43,10 +43,25 @@
                 (#{id}, #{image.originalFilename}, #{image.storedFilename})
             </foreach>
     </insert>
+<!--  후기 수정  -->
+    <update id="update">
+        UPDATE track_comments
+           SET content = #{content},
+               updated_at = NOW()
+         WHERE id = #{id}
+    </update>
+<!--  후기 수정하면서 삭제될 이미지 처리  -->
+    <delete id="deleteImages">
+        DELETE FROM track_comment_images
+         WHERE stored_filename IN
+         <foreach collection="deletedImages" item="image" open="(" separator="," close=")">
+             #{image}
+         </foreach>
+    </delete>
 <!--  후기 논리적 삭제  -->
     <delete id="delete">
         UPDATE track_comments
-           SET deleted_at = DEFAULT
+           SET deleted_at = NOW()
          WHERE id = #{commentId}
     </delete>
 </mapper>

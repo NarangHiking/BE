@@ -18,6 +18,10 @@ public interface TrackCommentDao {
     int insert(TrackCommentRequest comment);
     // 후기 작성 시 이미지가 있을 경우 저장
     void insertImages(@Param("id") Long id, @Param("images") List<ImageRequest> saveImages);
+    // 후기 수정
+    int update(TrackCommentRequest comment);
+    // 후기에 수정하면서 삭제될 이미지 처리
+    void deleteImages(List<String> deletedImages);
     // 후기 논리적 삭제
     void delete(Long commentId);
 }
