@@ -13,7 +13,7 @@
 
 -- users 테이블 더미데이터
 INSERT INTO users (email, pass, name, role) VALUES
-    ('admin@naranghiking.com', '$2a$10$c250VxjvhHZeC/KH6U.DuepbKEoK6zV6assPlL84ngrLkvKfuOc.q', '관리자', 'ADMIN'),
+    ('admin@naranghiking.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '관리자', 'ADMIN'),
     ('hong@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '홍길동', 'USER'),
     ('kim@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '김철수', 'USER'),
     ('lee@test.com', '$2a$10$BuGl5LRUoahZLlUlh2oWR.mcrDmEoTdXSi1bDp3VDL5z5EqY1VKmK', '이영희', 'USER'),
