@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "게시글 댓글과 관련된 컨트롤러")
 @RestController
-@RequestMapping("/board/{boardId}/comment") // boardId의 게시글 안에서만 일어나는 요청들
+@RequestMapping("/api/board/{boardId}/comment") // boardId의 게시글 안에서만 일어나는 요청들
 @RequiredArgsConstructor
 public class BoardCommentController {
 

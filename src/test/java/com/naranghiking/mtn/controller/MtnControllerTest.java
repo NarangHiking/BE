@@ -54,7 +54,7 @@ class MtnControllerTest {
     @Order(1)
     @DisplayName("산 전체 조회")
     void selectAll() throws Exception {
-        mockMvc.perform(get("/mtn/list").header("Authorization", "Bearer " + adminToken))
+        mockMvc.perform(get("/api/mtn/list").header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
@@ -63,7 +63,7 @@ class MtnControllerTest {
     @Order(2)
     @DisplayName("산 추가")
     void insert() throws Exception {
-        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + adminToken)
+        mockMvc.perform(post("/api/mtn").header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testMtn)))
                 .andExpect(status().isCreated())
@@ -74,7 +74,7 @@ class MtnControllerTest {
     @Order(3)
     @DisplayName("산 추가 - 일반유저")
     void userInsert() throws Exception {
-        mockMvc.perform(post("/mtn").header("Authorization", "Bearer " + userToken)
+        mockMvc.perform(post("/api/mtn").header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testMtn)))
                 .andExpect(status().isForbidden());
@@ -90,7 +90,7 @@ class MtnControllerTest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(get("/mtn/" + inserted.getId()))
+        mockMvc.perform(get("/api/mtn/" + inserted.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.name").value("테스트 산"));
@@ -100,7 +100,7 @@ class MtnControllerTest {
     @Order(5)
     @DisplayName("존재하지 않는 산 단일 조회 - 실패")
     void selectNotFound() throws Exception {
-        mockMvc.perform(get("/mtn/999999"))
+        mockMvc.perform(get("/api/mtn/999999"))
                 .andExpect(status().is5xxServerError());
     }
 
@@ -116,7 +116,7 @@ class MtnControllerTest {
         inserted.setName("수정된 산");
         inserted.setHeight(2000);
 
-        mockMvc.perform(put("/mtn/" + inserted.getId())
+        mockMvc.perform(put("/api/mtn/" + inserted.getId())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inserted)))
@@ -135,7 +135,7 @@ class MtnControllerTest {
                 .orElseThrow();
         System.out.println("삭제 요청 id: " + inserted.getId());  // 추가
 
-        mockMvc.perform(delete("/mtn/" + inserted.getId())
+        mockMvc.perform(delete("/api/mtn/" + inserted.getId())
                         .header("Authorization", "Bearer " + adminToken)
                 )
                 .andExpect(status().isOk())
@@ -157,7 +157,7 @@ class MtnControllerTest {
     @Order(9)
     @DisplayName("산 하위 경로 표시")
     void selectPathFromMtn() throws Exception {
-        mockMvc.perform(get("/mtn/1/track"))
+        mockMvc.perform(get("/api/mtn/1/track"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

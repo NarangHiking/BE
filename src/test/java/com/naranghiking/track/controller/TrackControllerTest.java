@@ -43,7 +43,7 @@ class TrackControllerTest {
 
     @Test
     void selectByName() throws Exception {
-        mockMvc.perform(get("/track/search?name=울산"))
+        mockMvc.perform(get("/api/track/search?name=울산"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -52,7 +52,7 @@ class TrackControllerTest {
     @DisplayName("산 이름으로 경로 검색")
     @Test
     void selectByConditionMtnName() throws Exception {
-        mockMvc.perform(get("/track").param("mtnName", "북한산"))
+        mockMvc.perform(get("/api/track").param("mtnName", "북한산"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -60,7 +60,7 @@ class TrackControllerTest {
     @DisplayName("지역으로 경로 검색")
     @Test
     void selectByConditionLocation() throws Exception {
-        mockMvc.perform(get("/track").param("location", "제주"))
+        mockMvc.perform(get("/api/track").param("location", "제주"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -68,7 +68,7 @@ class TrackControllerTest {
     @DisplayName("고도로 경로 검색")
     @Test
     void selectByConditionHeight() throws Exception {
-        mockMvc.perform(get("/track").param("height", "1900"))
+        mockMvc.perform(get("/api/track").param("height", "1900"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -76,7 +76,7 @@ class TrackControllerTest {
     @DisplayName("복합 검색 2가지로 경로 검색")
     @Test
     void selectByDualCondition() throws Exception {
-        mockMvc.perform(get("/track")
+        mockMvc.perform(get("/api/track")
                         .param("location", "제주")
                         .param("height", "1900"))
                 .andExpect(status().isOk())
@@ -86,7 +86,7 @@ class TrackControllerTest {
     @DisplayName("복합 검색 3가지로 경로 검색")
     @Test
     void selectByTripleCondition() throws Exception {
-        mockMvc.perform(get("/track")
+        mockMvc.perform(get("/api/track")
                         .param("mtnName", "한라")
                         .param("location", "제주")
                         .param("height", "1900"))
@@ -97,7 +97,7 @@ class TrackControllerTest {
     @DisplayName("복합 검색 - 결과 없음")
     @Test
     void selectByCondition_fail() throws Exception {
-        mockMvc.perform(get("/track")
+        mockMvc.perform(get("/api/track")
                         .param("mtnName", "테스트")
                         .param("location", "제주")
                         .param("height", "1900"))
@@ -108,7 +108,7 @@ class TrackControllerTest {
     @DisplayName("아이디로 조회")
     @Test
     void selectById() throws Exception {
-        mockMvc.perform(get("/track/16"))
+        mockMvc.perform(get("/api/track/16"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -116,7 +116,7 @@ class TrackControllerTest {
     @DisplayName("아이디로 조회-실패")
     @Test
     void selectById_fail() throws Exception {
-        mockMvc.perform(get("/track/17"))
+        mockMvc.perform(get("/api/track/17"))
                 .andExpect(status().isNotFound())
                 .andDo(print());
     }
@@ -126,7 +126,7 @@ class TrackControllerTest {
     @Order(1)
     void insert() throws Exception {
         adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
-        MvcResult result = mockMvc.perform(post("/track")
+        MvcResult result = mockMvc.perform(post("/api/track")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(track)))
@@ -147,7 +147,7 @@ class TrackControllerTest {
         track.setName("수정된 코스");
         track.setGpxFilePath("/gpx/temp/updated.gpx");
 
-        mockMvc.perform(put("/track")
+        mockMvc.perform(put("/api/track")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(track)))
@@ -162,7 +162,7 @@ class TrackControllerTest {
     @Order(3)
     void deleteTrack() throws Exception {
         adminToken = jwtUtil.generateAccessToken(1L, "ADMIN");
-        mockMvc.perform(delete("/track/" + track.getId())
+        mockMvc.perform(delete("/api/track/" + track.getId())
                         .header("Authorization", "Bearer " + adminToken)
                 )
                 .andExpect(status().isOk())

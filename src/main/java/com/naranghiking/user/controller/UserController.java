@@ -7,15 +7,18 @@ import com.naranghiking.user.dto.UserResponse;
 import com.naranghiking.user.service.UserServiceImpl;
 import com.naranghiking.common.dto.ApiResult;
 import com.naranghiking.user.dto.SignUpRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @ResponseBody
 @RequiredArgsConstructor
 @RestController
@@ -56,9 +59,17 @@ public class UserController {
     @PatchMapping("/remove")
     ResponseEntity<ApiResult> remove(
             @AuthenticationPrincipal Long userId,
-            @RequestHeader("Authorization") String bearer
+            HttpServletRequest req
     ){
-        userService.delete(userId, bearer.substring(7));
+        String token = null;
+        if (req.getCookies() != null) {
+            token = Arrays.stream(req.getCookies())
+                    .filter(c -> "accessToken".equals(c.getName()))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
+        }
+        userService.delete(userId, token);
         return ResponseEntity.ok(ApiResult.success("ok"));
     }
 }
