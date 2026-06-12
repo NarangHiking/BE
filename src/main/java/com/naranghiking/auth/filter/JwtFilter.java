@@ -1,8 +1,10 @@
 package com.naranghiking.auth.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -66,10 +68,12 @@ public class JwtFilter extends OncePerRequestFilter {
 	}
 	
 	private String resolveToken(HttpServletRequest request) {
-		String bearer = request.getHeader("Authorization");
-		if (bearer != null && bearer.startsWith("Bearer ")) {
-			return bearer.substring(7);
-		}
-		return null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
+        return Arrays.stream(cookies)
+                .filter(c -> "accessToken".equals(c.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
 	}
 }
