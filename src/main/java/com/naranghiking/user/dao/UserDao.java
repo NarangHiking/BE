@@ -4,6 +4,7 @@ import com.naranghiking.user.dto.SignUpRequest;
 import com.naranghiking.user.dto.UpdateRequest;
 import com.naranghiking.user.dto.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface UserDao {
     int update(UpdateRequest request);
 
     void delete(Long userId);
+    // 논리적 삭제 유저 데이터 물리적 삭제 실시
+    void deleteExpiredUsers(@Param("pivot") int pivot);
 }

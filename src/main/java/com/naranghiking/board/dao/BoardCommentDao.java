@@ -15,4 +15,6 @@ public interface BoardCommentDao {
     int update(@Param("comment") BoardCommentRequest comment);
     // 댓글 삭제(논리적)
     int delete(Long commentId);
+    // 댓글 삭제(물리적)
+    void deleteExpiredData(@Param("pivot") int pivot);
 }

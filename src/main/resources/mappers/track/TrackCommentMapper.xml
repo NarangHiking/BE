@@ -64,4 +64,29 @@
            SET deleted_at = NOW()
          WHERE id = #{commentId}
     </delete>
+<!--  물리적 삭제를 위한 idList 조회  -->
+    <select id="selectExpiredData" resultType="Long">
+        <![CDATA[
+        SELECT id
+          FROM track_comments
+         WHERE deleted_at < DATE_SUB(NOW(), INTERVAL #{pivot} MINUTE)
+        ]]>
+    </select>
+<!--  삭제될 이미지 리스트 조회  -->
+    <select id="selectExpiredImages" resultType="String">
+        SELECT stored_filename
+          FROM track_comment_images
+         WHERE comment_id IN
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+<!--  물리적 삭제 수행  -->
+    <delete id="deleteExpiredComments">
+        DELETE FROM track_comments
+         WHERE id IN
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
