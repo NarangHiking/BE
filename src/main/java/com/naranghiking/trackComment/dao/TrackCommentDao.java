@@ -24,4 +24,10 @@ public interface TrackCommentDao {
     void deleteImages(List<String> deletedImages);
     // 후기 논리적 삭제
     void delete(Long commentId);
+    // 물리적 삭제를 위한 idList 조회
+    List<Long> selectExpiredData(@Param("pivot") int pivot);
+    // 삭제될 후기에 첨부된 이미지 리스트 조회
+    List<String> selectExpiredImages(List<Long> idList);
+    // 후기의 물리적 삭제 수행
+    void deleteExpiredComments(List<Long> idList);
 }

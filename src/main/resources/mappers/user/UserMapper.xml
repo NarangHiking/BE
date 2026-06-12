@@ -40,5 +40,11 @@
         set deleted_at = CURRENT_TIMESTAMP
         where id = #{userId}
     </update>
-
+<!--  논리적 삭제에서 물리적 삭제로  -->
+    <delete id="deleteExpiredUsers">
+        <![CDATA[
+        DELETE FROM users
+         WHERE deleted_at < DATE_SUB(NOW(), INTERVAL #{pivot} MINUTE)
+        ]]>
+    </delete>
 </mapper>

@@ -22,10 +22,17 @@
                updated_at = CURRENT_TIMESTAMP
          WHERE id = #{comment.id}
     </update>
-<!--  댓글 삭제  -->
+<!--  댓글 삭제(논리적)  -->
     <update id="delete">
         UPDATE board_comments
            SET deleted_at = CURRENT_TIMESTAMP
          WHERE id = #{commentId}
     </update>
+<!--  댓글 삭제(물리적)  -->
+    <delete id="deleteExpiredData">
+        <![CDATA[
+        DELETE FROM board_comments
+         WHERE deleted_at < DATE_SUB(NOW(), INTERVAL #{pivot} MINUTE)
+        ]]>
+    </delete>
 </mapper>
