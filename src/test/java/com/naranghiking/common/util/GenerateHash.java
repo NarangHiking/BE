@@ -3,7 +3,7 @@ package com.naranghiking.common.util;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class GenerateHash {
+public class GenerateHash { // 클래스 이름 변경 generateHash -> GenerateHash
     @Test
     void generateHashes() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
