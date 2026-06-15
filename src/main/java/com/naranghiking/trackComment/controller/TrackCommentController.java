@@ -22,7 +22,7 @@ import java.util.List;
 
 @Tag(name = "각 등산 코스의 후기와 관련된 컨트롤러")
 @RestController
-@RequestMapping("/track/{trackId}/comment")
+@RequestMapping("/api/track/{trackId}/comment")
 @RequiredArgsConstructor
 public class TrackCommentController {
 
