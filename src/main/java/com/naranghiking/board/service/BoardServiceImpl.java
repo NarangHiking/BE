@@ -6,6 +6,7 @@ import com.naranghiking.board.dto.BoardListResponse;
 import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.common.dto.ImageRequest;
 import com.naranghiking.common.service.FileService;
+import com.naranghiking.common.service.R2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardDao boardDao;
     private final FileService fileService;
+    private final R2Service r2Service;
 
     @Override
     public List<BoardListResponse> selectAll(String keyword, String category) {

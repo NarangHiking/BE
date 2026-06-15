@@ -1,6 +1,7 @@
 package com.naranghiking.track.controller;
 
 import com.naranghiking.common.dto.ApiResult;
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.track.dto.Track;
 import com.naranghiking.track.dto.TrackCondition;
 import com.naranghiking.track.service.TrackService;
@@ -8,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -16,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/track")
 public class TrackController {
     private final TrackService trackService;
+    private final R2Service r2Service;
 
     @GetMapping("/search")
     public ResponseEntity<ApiResult> selectByName(@RequestParam String name) {
@@ -39,24 +43,45 @@ public class TrackController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResult> insert(@RequestBody Track t) {
+    public ResponseEntity<ApiResult> insert(
+            @RequestPart Track t,
+            @RequestPart(value="file", required = false) MultipartFile file
+            ) throws IOException {
         // id 중복 체크 제거 (AUTO_INCREMENT라 의미 없음)
+
+        if (file != null) {
+            Long mtnId = t.getMountainId();
+            String storedFilename = r2Service.uploadFile(file, "gpx/" + mtnId);
+            t.setGpxFilePath(storedFilename);
+        }
+
         trackService.insert(t);
         return ResponseEntity.ok(ApiResult.success(t)); // ApiResult.success 중첩 제거
     }
 
     @PutMapping
-    public ResponseEntity<ApiResult> update(@RequestBody Track t) {
+    public ResponseEntity<ApiResult> update(@RequestPart Track t, @RequestPart(value="file", required = false) MultipartFile file) throws IOException {
         Track target = trackService.selectById(t.getId());
         if (target == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND) // UNAUTHORIZED → NOT_FOUND
-                    .body(ApiResult.fail("해당 경로가 존재하지 않습니다."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResult.fail("해당 경로가 존재하지 않습니다."));
+
+        if (file != null) {
+            r2Service.deleteFile(target.getGpxFilePath());
+            Long mtnId = t.getMountainId();
+            String storedName = r2Service.uploadFile(file, "gpx/" + mtnId);
+            t.setGpxFilePath(storedName);
+        }
         trackService.update(t);
         return ResponseEntity.ok(ApiResult.success(t));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResult> delete(@PathVariable Long id) {
+        Track target = trackService.selectById(id);
+        if (target == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResult.fail("해당 경로가 존재하지 않습니다."));
+        r2Service.deleteFile(target.getGpxFilePath() );
         trackService.delete(id);
         return ResponseEntity.ok(ApiResult.success("ok"));
     }
