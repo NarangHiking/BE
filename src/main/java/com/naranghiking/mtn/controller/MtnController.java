@@ -76,13 +76,20 @@ public class MtnController {
             throw new RuntimeException("해당 산이 이미 존재합니다.");
         }
 
-        String originalFilename = file.getOriginalFilename();
-        String storedFilename = r2Service.uploadFile(file, "images/mountain");
+        String storedFilename = null;
+        if (file != null && !file.isEmpty()) {
+            mtn.setStoredFilename(file.getOriginalFilename());
+            storedFilename = r2Service.uploadFile(file, "images/mountain");
+            mtn.setStoredFilename(storedFilename);
+        }
 
-        mtn.setOriginalFilename(originalFilename);
-        mtn.setStoredFilename(storedFilename);
-
-        mtnService.insert(mtn);
+        try {
+            mtnService.insert(mtn);
+        } catch(Exception e) {
+            if (storedFilename != null) {
+                r2Service.deleteFile(storedFilename);
+            }
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.success(mtn));
     }
 
