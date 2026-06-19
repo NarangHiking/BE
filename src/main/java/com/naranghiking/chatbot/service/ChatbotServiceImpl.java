@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -21,9 +22,9 @@ import java.util.Map;
 public class ChatbotServiceImpl implements ChatbotService{
 
     private static final String REDIS_KEY_PREFIX = "chat:session:"; // REDIS에 올릴 때 사용할 키의 앞부분
-    private static final long SESSION_TIMEOUT_LIMIT = 30; // 대화 내용 기억 시간
+    private static final long SESSION_TIMEOUT_LIMIT = 30; // 대화 내용 기억 시간(30분)
     private static final int MAX_HISTORY_SIZE = 10; // 사용자의 질문 5개, 답면 5개 조회
-    private static final double SCORE_PIVOT = 0.3; // 해당 수치보다 낮은 유사도는 엉뚱한 대답으로 간주
+    private static final double SCORE_PIVOT = 0.3;  // 해당 수치보다 낮은 유사도는 엉뚱한 대답으로 간주
 
     private final RedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
@@ -77,12 +78,21 @@ public class ChatbotServiceImpl implements ChatbotService{
             messagesToChatbot.addAll(histories);
             messagesToChatbot.add(Map.of("role", "user", "content", userMessage));
 
-            String result = callChatbot(messagesToChatbot); // 프롬프트와 사용자 메시지를 통해서 답변 생성
+            String answer = callChatbot(messagesToChatbot); // 프롬프트와 사용자 메시지를 통해서 답변 생성
 
             // 6. Redis에 새로운 대화 내역 업데이트 및 수명(TTL) 30분 연장
+            String userJson = objectMapper.writeValueAsString(Map.of("role", "user", "content", userMessage));
+            String chatbotJson = objectMapper.writeValueAsString(Map.of("role", "assistant", "content", answer));
 
+            // redis의 가장 최근 기록에 사용자의 메시지와 챗봇의 답변 추가
+            redisTemplate.opsForList().rightPushAll(key, userJson, chatbotJson);
+            // redis의 기록에서 가장 오래된 기록 삭제
+            redisTemplate.opsForList().trim(key, -MAX_HISTORY_SIZE, -1);
+            // 새롭게 대화가 진행되었으니 세션 만료 시간 초기화
+            redisTemplate.expire(key, SESSION_TIMEOUT_LIMIT, TimeUnit.MINUTES);
 
-            return result;
+            return answer;
+
         } catch (Exception e) { // 모든 예외에 대해 동일 메시지 전달
             log.error("[ChatbotService] 요청 처리 중 에러 발생 : ", e.getMessage());
             return "죄송합니다. 요청 처리 중 문제가 발생하였습니다.";
@@ -144,8 +154,16 @@ public class ChatbotServiceImpl implements ChatbotService{
         return context.toString();
     }
 
-    private String callChatbot(List<Map<String, String>> message) { // 프롬프트와 사용자 메시지를 통해 답변 생성
+    private String callChatbot(List<Map<String, String>> messages) { // 프롬프트와 사용자 메시지를 통해 답변 생성
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(gmsKey);
 
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", "gpt-5.4-mini");
+        body.put("messages", messages);
+        body.put("temperature", 0.7);
+        
 
         return "";
     }
