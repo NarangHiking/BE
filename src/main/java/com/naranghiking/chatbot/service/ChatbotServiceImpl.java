@@ -38,6 +38,8 @@ public class ChatbotServiceImpl implements ChatbotService{
     private String gmsKey; // gms api key
     @Value("${gms.embedding-url}")
     private String embeddingURL; // gms의 임베딩 url
+    @Value("${gms.chat-url}")
+    private String gmsChatURL; // 대화를 나누기 위한 url
 
     @Override // 메인 챗봇 실행
     public String chat(String userId, String userMessage) {
@@ -68,7 +70,9 @@ public class ChatbotServiceImpl implements ChatbotService{
             String prompt =
                     "너는 전 세계의 모든 산을 탐험한 경험이 있는 등산 전문가야.\n" +
                     "그리고 지금은 사용자의 등산 관련 질문에 대해서 답변을 해주었으면 좋겠어.\n" +
-                    "질문에 답변하기 전에 [참고자료]와 함께 사용자와 나누었던 [대화기록]을 너에게 알려줄게(없을 수도 있음), 이것을 기반으로 답변해줘\n" +
+                    "질문에 답변하기 전에 [참고자료]와 함께 사용자와 나누었던 [대화기록]을 너에게 알려줄게(없을 수도 있음), 이것을 기반으로 답변해줘.\n" +
+                    "그리고 채팅창에 표시하는 것이므로 마크다운이 아닌 일반 형식으로 부탁해, 그리고 답변은 적당한 길이었으면 좋겠어.\n" +
+                    "또한 코스 추천할 때 코스의 주요 경유지를 알려주는 것이 아닌, 실제 RAG에 기록된 코스 이름으로 추천해줬으면 좋겠어(1번코스, 2번코스)\n" +
                     "[참고자료]\n" + searchResult + "\n\n" +
                     "[대화기록]\n" + histories;
 
@@ -94,7 +98,7 @@ public class ChatbotServiceImpl implements ChatbotService{
             return answer;
 
         } catch (Exception e) { // 모든 예외에 대해 동일 메시지 전달
-            log.error("[ChatbotService] 요청 처리 중 에러 발생 : ", e.getMessage());
+            log.error("[ChatbotService] 요청 처리 중 에러 발생 : ", e);
             return "죄송합니다. 요청 처리 중 문제가 발생하였습니다.";
         }
     }
@@ -136,7 +140,7 @@ public class ChatbotServiceImpl implements ChatbotService{
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         // pinecone으로 request를 넘겨서 String 타입의 response를 받는다.
-        ResponseEntity<String> response = restTemplate.postForEntity(pineconeUrl, request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(pineconeUrl + "/query", request, String.class);
 
         // response에서 matches만 꺼내기.
         JsonNode nodes = objectMapper.readTree(response.getBody()).path("matches");
@@ -154,7 +158,7 @@ public class ChatbotServiceImpl implements ChatbotService{
         return context.toString();
     }
 
-    private String callChatbot(List<Map<String, String>> messages) { // 프롬프트와 사용자 메시지를 통해 답변 생성
+    private String callChatbot(List<Map<String, String>> messages) throws Exception { // 프롬프트와 사용자 메시지를 통해 답변 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(gmsKey);
@@ -163,8 +167,12 @@ public class ChatbotServiceImpl implements ChatbotService{
         body.put("model", "gpt-5.4-mini");
         body.put("messages", messages);
         body.put("temperature", 0.7);
-        
 
-        return "";
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        // url로 request(헤더랑 message)를 전송해서, String 응답을 받는다.
+        ResponseEntity<String> response = restTemplate.postForEntity(gmsChatURL, request, String.class);
+        // JSON으로 응답이 오는데 거기서 choices의 첫 번째 배열 중 message 안의 content를 추출
+        String answer = objectMapper.readTree(response.getBody()).path("choices").get(0).path("message").path("content").asText();
+        return answer;
     }
 }
