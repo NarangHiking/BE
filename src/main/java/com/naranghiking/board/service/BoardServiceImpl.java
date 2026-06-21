@@ -5,7 +5,6 @@ import com.naranghiking.board.dto.BoardDetailResponse;
 import com.naranghiking.board.dto.BoardListResponse;
 import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.common.dto.ImageRequest;
-import com.naranghiking.common.service.FileService;
 import com.naranghiking.common.service.R2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -13,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -20,9 +21,25 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
 
+    private static final String IMAGE_FOLDER = "board";
+
     private final BoardDao boardDao;
-    private final FileService fileService;
     private final R2Service r2Service;
+
+    // 게시글 이미지들을 R2에 업로드하고 (원본명, R2 키) 목록을 만든다.
+    private List<ImageRequest> uploadImages(List<MultipartFile> images) {
+        List<ImageRequest> result = new ArrayList<>();
+        for (MultipartFile file : images) {
+            if (file.isEmpty()) continue;
+            try {
+                String key = r2Service.uploadImage(file, IMAGE_FOLDER);
+                result.add(new ImageRequest(file.getOriginalFilename(), key));
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 업로드 중 에러 발생", e);
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<BoardListResponse> selectAll(String keyword, String category) {
@@ -30,7 +47,15 @@ public class BoardServiceImpl implements BoardService {
         if(keyword == null || keyword.trim().isEmpty()) keyword = null;
         if(category == null || category.trim().isEmpty()) category = null;
 
-        return boardDao.selectAll(keyword, category);
+        List<BoardListResponse> boards = boardDao.selectAll(keyword, category);
+        // 대표 이미지 키를 화면 표시용 공개 URL로 변환 (이미지가 없으면 null로 두어 FE가 기본 이미지로 대체)
+        if(boards != null) {
+            boards.forEach(b -> {
+                String image = b.getImage(); // 이미지가 없으면 "default_image.png" 반환
+                b.setImageUrl("default_image.png".equals(image) ? null : r2Service.getPublicUrl(image));
+            });
+        }
+        return boards;
     }
 
     @Override
@@ -38,6 +63,12 @@ public class BoardServiceImpl implements BoardService {
         BoardDetailResponse board = boardDao.selectById(id);
         // 게시글을 찾지 못하면 404 반환
         if(board == null) throw new NoSuchElementException("조회 실패, 해당 게시글을 찾을 수 없습니다.");
+        // 저장된 이미지 키들을 화면 표시용 공개 URL로 변환
+        if(board.getImages() != null) {
+            board.setImageUrls(board.getImages().stream()
+                    .map(r2Service::getPublicUrl)
+                    .toList());
+        }
         return board;
     }
 
@@ -48,7 +79,7 @@ public class BoardServiceImpl implements BoardService {
         if(result == 0) throw new RuntimeException("게시글 저장에 실패했습니다.");
 
         if(images != null && !images.isEmpty()) {
-            List<ImageRequest> saveImages = fileService.saveFiles(images, "board");
+            List<ImageRequest> saveImages = uploadImages(images);
 
             if(!saveImages.isEmpty()) { // 성공적으로 값이 전달되면 DB에 저장
                 boardDao.insertImages(board.getId(), saveImages);
@@ -68,7 +99,7 @@ public class BoardServiceImpl implements BoardService {
         if(result == 0) throw new RuntimeException("게시글 수정 중 오류 발생");
         // 새로운 이미지 저장
         if(addedImages != null && !addedImages.isEmpty()) {
-            List<ImageRequest> saveImages = fileService.saveFiles(addedImages, "board");
+            List<ImageRequest> saveImages = uploadImages(addedImages);
 
             if(!saveImages.isEmpty()) {
                 boardDao.insertImages(id, saveImages);
@@ -76,7 +107,7 @@ public class BoardServiceImpl implements BoardService {
         }
         // 기존 이미지 삭제
         if(deletedImages != null && !deletedImages.isEmpty()) {
-            fileService.deleteFiles(deletedImages, "board");
+            deletedImages.forEach(r2Service::deleteFile); // R2 저장소에서 삭제
             // DB에서도 삭제
             boardDao.deleteImages(deletedImages);
         }

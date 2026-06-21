@@ -56,6 +56,7 @@ public class TrackController {
         }
 
         trackService.insert(t);
+        t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath()));
         return ResponseEntity.ok(ApiResult.success(t)); // ApiResult.success 중첩 제거
     }
 
@@ -72,6 +73,7 @@ public class TrackController {
             t.setGpxFilePath(storedName);
         }
         trackService.update(t);
+        t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath()));
         return ResponseEntity.ok(ApiResult.success(t));
     }
 

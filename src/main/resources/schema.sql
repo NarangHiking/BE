@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS boards (
     deleted_at TIMESTAMP DEFAULT NULL,
 	
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (track_id) REFERENCES tracks(id)
+    FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS board_images (
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS track_comments (
     deleted_at TIMESTAMP DEFAULT NULL,
 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (track_id) REFERENCES tracks(id)
+    FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS track_comment_images (

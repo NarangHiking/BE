@@ -1,5 +1,6 @@
 package com.naranghiking.track.service;
 
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.track.dao.TrackDao;
 import com.naranghiking.track.dto.Track;
 import com.naranghiking.track.dto.TrackCondition;
@@ -13,25 +14,36 @@ import java.util.List;
 public class TrackServiceImpl implements TrackService{
 
     private final TrackDao trackDao;
+    private final R2Service r2Service;
+
+    // 조회된 트랙들에 GPX 공개 URL을 채워준다.
+    private List<Track> withGpxUrl(List<Track> tracks) {
+        tracks.forEach(t -> t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath())));
+        return tracks;
+    }
 
     @Override
     public List<Track> selectByMtnId(Long mountainId) {
-        return trackDao.selectByMtnId(mountainId);
+        return withGpxUrl(trackDao.selectByMtnId(mountainId));
     }
 
     @Override
     public List<Track> selectByName(String name) {
-        return trackDao.selectByName(name);
+        return withGpxUrl(trackDao.selectByName(name));
     }
 
     @Override
     public List<Track> selectByCondition(TrackCondition condition) {
-        return trackDao.selectByCondition(condition);
+        return withGpxUrl(trackDao.selectByCondition(condition));
     }
 
     @Override
     public Track selectById(Long id) {
-        return trackDao.selectById(id);
+        Track track = trackDao.selectById(id);
+        if (track != null) {
+            track.setGpxUrl(r2Service.getPublicUrl(track.getGpxFilePath()));
+        }
+        return track;
     }
 
     @Override

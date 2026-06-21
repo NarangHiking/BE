@@ -1,5 +1,6 @@
 package com.naranghiking.recommend.service;
 
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.recommend.dao.RecommendDao;
 import com.naranghiking.track.dto.Track;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.List;
 public class RecommendServiceImpl implements RecommendService{
 
     private final RecommendDao recommendDao;
+    private final R2Service r2Service;
 
     @Override
     public int insert(Long userId, Long trackId) {
@@ -30,6 +32,8 @@ public class RecommendServiceImpl implements RecommendService{
 
     @Override
     public List<Track> selectRecommends(Long userId) {
-        return recommendDao.selectRecommends(userId);
+        List<Track> tracks = recommendDao.selectRecommends(userId);
+        tracks.forEach(t -> t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath())));
+        return tracks;
     }
 }

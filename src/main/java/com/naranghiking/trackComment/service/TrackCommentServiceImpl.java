@@ -1,7 +1,8 @@
 package com.naranghiking.trackComment.service;
 
 import com.naranghiking.common.dto.ImageRequest;
-import com.naranghiking.common.service.FileService;
+import com.naranghiking.common.dto.ImageResponse;
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.trackComment.dao.TrackCommentDao;
 import com.naranghiking.trackComment.dto.TrackCommentListResponse;
 import com.naranghiking.trackComment.dto.TrackCommentRequest;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -18,8 +21,25 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class TrackCommentServiceImpl implements TrackCommentService {
 
+    private static final String IMAGE_FOLDER = "trackComment";
+
     private final TrackCommentDao trackCommentDao;
-    private final FileService fileService;
+    private final R2Service r2Service;
+
+    // 후기 이미지들을 R2에 업로드하고 (원본명, R2 키) 목록을 만든다.
+    private List<ImageRequest> uploadImages(List<MultipartFile> images) {
+        List<ImageRequest> result = new ArrayList<>();
+        for (MultipartFile file : images) {
+            if (file.isEmpty()) continue;
+            try {
+                String key = r2Service.uploadImage(file, IMAGE_FOLDER);
+                result.add(new ImageRequest(file.getOriginalFilename(), key));
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 업로드 중 에러 발생", e);
+            }
+        }
+        return result;
+    }
 
     @Override
     public Long selectById(Long commentId) {
@@ -31,7 +51,17 @@ public class TrackCommentServiceImpl implements TrackCommentService {
     @Override
     public List<TrackCommentListResponse> selectAll(Long trackId) {
         // 결과값이 0이어도 알아서 빈 리스트가 전달
-        return trackCommentDao.selectAll(trackId);
+        List<TrackCommentListResponse> comments = trackCommentDao.selectAll(trackId);
+        // 각 후기 이미지 키들을 화면 표시용 공개 URL로 변환
+        comments.forEach(c -> {
+            if (c.getImages() != null) {
+                c.setImageUrls(c.getImages().stream()
+                        .map(ImageResponse::storedFilename)
+                        .map(r2Service::getPublicUrl)
+                        .toList());
+            }
+        });
+        return comments;
     }
 
     @Transactional
@@ -41,7 +71,7 @@ public class TrackCommentServiceImpl implements TrackCommentService {
         if(result == 0) throw new RuntimeException("후기 저장에 실패했습니다.");
 
         if(images != null && !images.isEmpty()) {
-            List<ImageRequest> saveImages = fileService.saveFiles(images, "trackComment");
+            List<ImageRequest> saveImages = uploadImages(images);
 
             if(!saveImages.isEmpty()) {
                 trackCommentDao.insertImages(comment.getId(), saveImages);
@@ -62,7 +92,7 @@ public class TrackCommentServiceImpl implements TrackCommentService {
         if(result == 0) throw new RuntimeException("후기 수정 중 오류 발생");
         // 새로운 이미지 저장
         if(addedImages != null && !addedImages.isEmpty()) {
-            List<ImageRequest> saveImages = fileService.saveFiles(addedImages, "trackComment");
+            List<ImageRequest> saveImages = uploadImages(addedImages);
 
             if(!saveImages.isEmpty()) {
                 trackCommentDao.insertImages(comment.getId(), saveImages);
@@ -70,7 +100,7 @@ public class TrackCommentServiceImpl implements TrackCommentService {
         }
         // 기존 이미지 삭제
         if(deletedImages != null && !deletedImages.isEmpty()) {
-            fileService.deleteFiles(deletedImages, "trackComment");
+            deletedImages.forEach(r2Service::deleteFile); // R2 저장소에서 삭제
             // DB에서도 삭제
             trackCommentDao.deleteImages(deletedImages);
         }
