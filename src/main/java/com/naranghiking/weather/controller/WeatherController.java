@@ -4,6 +4,7 @@ import com.naranghiking.common.dto.ApiResult;
 import com.naranghiking.weather.dto.WeatherResponse;
 import com.naranghiking.weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

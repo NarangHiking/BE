@@ -8,8 +8,12 @@
         <result column="user_id" property="userId"/>
         <result column="created_at" property="createdAt"/>
 
-        <collection property="images" ofType="com.naranghiking.common.dto.ImageResponse" autoMapping="true">
-            <id column="stored_filename" property="storedFilename"/>
+        <collection property="images" ofType="com.naranghiking.common.dto.ImageResponse">
+            <!-- ImageResponse는 record라 setter가 없으므로 생성자(originalFilename, storedFilename 순서)로 매핑 -->
+            <constructor>
+                <arg column="original_filename" javaType="java.lang.String"/>
+                <idArg column="stored_filename" javaType="java.lang.String"/>
+            </constructor>
         </collection>
     </resultMap>
 <!--  후기 한 건만 조회해서 userId 반환  -->

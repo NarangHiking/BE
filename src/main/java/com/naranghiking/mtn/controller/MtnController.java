@@ -76,13 +76,24 @@ public class MtnController {
             throw new RuntimeException("해당 산이 이미 존재합니다.");
         }
 
-        String originalFilename = file.getOriginalFilename();
-        String storedFilename = r2Service.uploadFile(file, "images/mountain");
+        String storedFilename = null;
+        if (file != null && !file.isEmpty()) {
+            mtn.setOriginalFilename(file.getOriginalFilename());
+            storedFilename = r2Service.uploadFile(file, "images/mtn");
+            mtn.setStoredFilename(storedFilename);
+        }
 
-        mtn.setOriginalFilename(originalFilename);
-        mtn.setStoredFilename(storedFilename);
+        try {
+            mtnService.insert(mtn);
+        } catch (Exception e) {
+            // DB 저장 실패 시 R2에 올린 파일을 정리(고아 파일 방지)한 뒤 예외를 다시 던진다.
+            if (storedFilename != null) {
+                r2Service.deleteFile(storedFilename);
+            }
+            throw e;
+        }
 
-        mtnService.insert(mtn);
+        mtn.setImageUrl(r2Service.getPublicUrl(mtn.getStoredFilename()));
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.success(mtn));
     }
 
@@ -97,16 +108,17 @@ public class MtnController {
             throw new RuntimeException("해당 산이 존재하지 않습니다.");
         }
 
-        if (file != null) {
+        if (file != null && !file.isEmpty()) {
             r2Service.deleteFile(target.getStoredFilename());
             String originalFilename = file.getOriginalFilename();
-            String storedFilename = r2Service.uploadFile(file, "images/mountain");
+            String storedFilename = r2Service.uploadFile(file, "images/mtn");
             mtn.setOriginalFilename(originalFilename);
             mtn.setStoredFilename(storedFilename);
         }
 
 
         mtnService.update(mtn);
+        mtn.setImageUrl(r2Service.getPublicUrl(mtn.getStoredFilename()));
         return ResponseEntity.status(HttpStatus.OK).body(ApiResult.success(mtn));
     }
 

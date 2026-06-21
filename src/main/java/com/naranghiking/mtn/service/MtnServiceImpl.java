@@ -1,5 +1,6 @@
 package com.naranghiking.mtn.service;
 
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.mtn.dao.MtnDao;
 import com.naranghiking.mtn.dto.Mtn;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +15,22 @@ import java.util.List;
 public class MtnServiceImpl implements MtnService {
 
     private final MtnDao mtnDao;
+    private final R2Service r2Service;
 
     @Override
     public List<Mtn> selectAll() {
-        return mtnDao.selectAll();
+        List<Mtn> mtns = mtnDao.selectAll();
+        mtns.forEach(m -> m.setImageUrl(r2Service.getPublicUrl(m.getStoredFilename())));
+        return mtns;
     }
 
     @Override
     public Mtn select(Long id) {
-        return mtnDao.select(id);
+        Mtn mtn = mtnDao.select(id);
+        if (mtn != null) {
+            mtn.setImageUrl(r2Service.getPublicUrl(mtn.getStoredFilename()));
+        }
+        return mtn;
     }
 
     @Override

@@ -11,4 +11,5 @@ public class Track {
     private String name;
     private String gpxFilePath;
     private Integer recommendCnt;
+    private String gpxUrl; // GPX 다운로드용 R2 공개 URL (gpxFilePath로부터 생성)
 }

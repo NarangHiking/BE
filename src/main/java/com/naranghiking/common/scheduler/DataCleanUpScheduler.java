@@ -2,7 +2,7 @@ package com.naranghiking.common.scheduler;
 
 import com.naranghiking.board.dao.BoardCommentDao;
 import com.naranghiking.board.dao.BoardDao;
-import com.naranghiking.common.service.FileService;
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.trackComment.dao.TrackCommentDao;
 import com.naranghiking.user.dao.UserDao;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 
 
     private final BoardDao boardDao;
     private final BoardCommentDao boardCommentDao;
-    private final FileService fileService;
+    private final R2Service r2Service;
     private final UserDao userDao;
     private final TrackCommentDao trackCommentDao;
 
@@ -46,7 +46,7 @@ public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 
             if(deletedImageList != null && !deletedImageList.isEmpty()) {
                 boardDao.deleteImages(deletedImageList); // DB에서 이미지 삭제
                 log.info("[Board 스케줄러 동작 중] 게시글에 첨부된 이미지 DB에서 삭제 완료");
-                fileService.deleteFiles(deletedImageList, "board"); // 저장소에서 이미지 삭제
+                deletedImageList.forEach(r2Service::deleteFile); // R2 저장소에서 이미지 삭제
                 log.info("[Board 스케줄러 동작 중] 게시글에 첨부된 이미지 저장소에서 삭제 완료");
             }
 
@@ -72,7 +72,7 @@ public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 
             if(deletedImageList != null && !deletedImageList.isEmpty()) {
                 trackCommentDao.deleteImages(deletedImageList);
                 log.info("[TrackComment 스케줄러 동작 중] 후기에 첨부된 이미지 DB에서 삭제 완료");
-                fileService.deleteFiles(deletedImageList, "trackComment");
+                deletedImageList.forEach(r2Service::deleteFile);
                 log.info("[TrackComment 스케줄러 동작 중] 후기에 첨부된 이미지 저장소에서 삭제 완료");
             }
 

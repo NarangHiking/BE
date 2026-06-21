@@ -1,5 +1,6 @@
 package com.naranghiking.favorite.service;
 
+import com.naranghiking.common.service.R2Service;
 import com.naranghiking.favorite.dao.FavoriteDao;
 import com.naranghiking.track.dto.Track;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.List;
 public class FavoriteServiceImpl implements FavoriteService {
 
     private final FavoriteDao favoriteDao;
+    private final R2Service r2Service;
 
     @Override
     public int insert(Long userId, Long trackId) {
@@ -33,6 +35,8 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public List<Track> selectFavorites(Long userId) {
-        return favoriteDao.selectFavorites(userId);
+        List<Track> tracks = favoriteDao.selectFavorites(userId);
+        tracks.forEach(t -> t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath())));
+        return tracks;
     }
 }
