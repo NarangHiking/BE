@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +26,7 @@ public class ChatbotServiceImpl implements ChatbotService{
     private static final int MAX_HISTORY_SIZE = 10; // 사용자의 질문 5개, 답면 5개 조회
     private static final double SCORE_PIVOT = 0.3;  // 해당 수치보다 낮은 유사도는 엉뚱한 대답으로 간주
 
-    private final RedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
@@ -68,13 +68,18 @@ public class ChatbotServiceImpl implements ChatbotService{
 
             // 4. 시스템 프롬프트 조립 (검색된 정보 + 이전 대화 기록)
             String prompt =
-                    "너는 전 세계의 모든 산을 탐험한 경험이 있는 등산 전문가야.\n" +
-                    "그리고 지금은 사용자의 등산 관련 질문에 대해서 답변을 해주었으면 좋겠어.\n" +
-                    "질문에 답변하기 전에 [참고자료]와 함께 사용자와 나누었던 [대화기록]을 너에게 알려줄게(없을 수도 있음), 이것을 기반으로 답변해줘.\n" +
-                    "그리고 채팅창에 표시하는 것이므로 마크다운이 아닌 일반 형식으로 부탁해, 그리고 답변은 적당한 길이었으면 좋겠어.\n" +
-                    "또한 코스 추천할 때 코스의 주요 경유지를 알려주는 것이 아닌, 실제 RAG에 기록된 코스 이름으로 추천해줬으면 좋겠어(1번코스, 2번코스)\n" +
+                    "너는 전 세계의 모든 산을 탐험한 경험이 있는 친절한 등산 전문가야.\n" +
+                    "사용자의 등산 관련 질문에 대해 아래 [참고자료]와 [대화기록]을 기반으로 답변해줘.\n\n" +
+                    "[답변 작성 필수 규칙] - 이하 내용 반드시 지킬 것\n" +
+                    "1. 형식: 마크다운(##, ** 등)을 절대 사용하지 말고, 읽기 편한 일반 텍스트로 작성할 것.\n" +
+                    "2. 분량: 불필요한 말은 빼고 핵심만 담아 적당한 길이로 대답할 것.\n" +
+                    "3. 명칭 정확성: 코스를 추천할 때, [참고자료]에 기록된 공식 코스 이름(예: '팔공산_1번코스', '팔공산_2번코스' 등)을 임의로 변형하지 말고 그대로 정확히 출력할 것.\n" +
+                    "4. 내용: 자잘한 경유지들을 기계적으로 모두 나열하지 말고, 해당 코스의 이름과 특징 위주로 자연스럽게 추천할 것.\n" +
+                    "5. 정보의 엄격한 통제: 코스를 추천할 때는 무조건 [참고자료]에 존재하는 코스만 추천해. 개인적으로 알고 있는 다른 산이나 코스를 절대로 지어내거나 추가하지 말 것.\n\n" +
                     "[참고자료]\n" + searchResult + "\n\n" +
                     "[대화기록]\n" + histories;
+            log.info("[ChatbotService] 프롬프트 생성 완료 - searchResult: {}", searchResult);
+            log.info("[ChatbotService] 프롬프트 생성 완료 - histories: {}", histories);
 
             // 5. GMS(LLM)에 최종 답변 요청
             List<Map<String, String>> messagesToChatbot = new ArrayList<>();
@@ -83,6 +88,7 @@ public class ChatbotServiceImpl implements ChatbotService{
             messagesToChatbot.add(Map.of("role", "user", "content", userMessage));
 
             String answer = callChatbot(messagesToChatbot); // 프롬프트와 사용자 메시지를 통해서 답변 생성
+            log.info("[ChatbotService] 답변 생성 완료");
 
             // 6. Redis에 새로운 대화 내역 업데이트 및 수명(TTL) 30분 연장
             String userJson = objectMapper.writeValueAsString(Map.of("role", "user", "content", userMessage));
@@ -135,7 +141,7 @@ public class ChatbotServiceImpl implements ChatbotService{
         // vector 정보를 넘겨서 그거 기반으로 가장 유사한 코스 2개 조회해보자
         Map<String, Object> body = new HashMap<>();
         body.put("vector", vector);
-        body.put("topK", 2); // 가장 유사한 코스 2개 꺼내기
+        body.put("topK", 5); // 가장 유사한 코스 2개 꺼내기
         body.put("includeMetadata", true);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
@@ -172,7 +178,6 @@ public class ChatbotServiceImpl implements ChatbotService{
         // url로 request(헤더랑 message)를 전송해서, String 응답을 받는다.
         ResponseEntity<String> response = restTemplate.postForEntity(gmsChatURL, request, String.class);
         // JSON으로 응답이 오는데 거기서 choices의 첫 번째 배열 중 message 안의 content를 추출
-        String answer = objectMapper.readTree(response.getBody()).path("choices").get(0).path("message").path("content").asText();
-        return answer;
+        return objectMapper.readTree(response.getBody()).path("choices").get(0).path("message").path("content").asText();
     }
 }
