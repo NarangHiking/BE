@@ -85,7 +85,8 @@ public enum MtnGrid {
     HWANGMAESAN("황매산", 80, 82),
     HWANGSEOKSAN("황석산", 75, 86),
     HWANGAKSAN("황악산", 78, 96),
-    HWANGJANGSAN("황장산", 80, 111);
+    HWANGJANGSAN("황장산", 80, 111),
+    Test("test", 80, 80);
 
     private final String name;
     private final int nx;

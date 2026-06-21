@@ -7,6 +7,7 @@ import com.naranghiking.track.dto.TrackCondition;
 import com.naranghiking.track.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +43,16 @@ public class TrackController {
         return ResponseEntity.ok(ApiResult.success(track));
     }
 
+    @PostMapping(value = "/bulk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResult> bulkInsert(
+            @RequestPart("tracks") List<Track> tracks,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files
+    ) {
+        // files[i] ↔ tracks[i] 순서로 매칭. 하나라도 실패하면 전부 롤백(R2 보상 삭제 포함)
+        List<Track> result = trackService.bulkInsert(tracks, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.success(result));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResult> insert(
             @RequestPart Track t,
@@ -56,6 +67,7 @@ public class TrackController {
         }
 
         trackService.insert(t);
+        t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath()));
         return ResponseEntity.ok(ApiResult.success(t)); // ApiResult.success 중첩 제거
     }
 
@@ -72,6 +84,7 @@ public class TrackController {
             t.setGpxFilePath(storedName);
         }
         trackService.update(t);
+        t.setGpxUrl(r2Service.getPublicUrl(t.getGpxFilePath()));
         return ResponseEntity.ok(ApiResult.success(t));
     }
 

@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -26,6 +27,23 @@ public class R2Service {
 
     @Value("${cloudflare.r2.public-base-url}")
     private String publicBaseUrl;
+
+    // 이미지로 허용할 확장자 (기존 FileService의 검증 로직을 이관)
+    private static final Set<String> ALLOWED_IMAGE_EXTENSIONS =
+            Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
+
+    // 이미지 전용 업로드: 확장자 검증 후 R2에 업로드 (GPX 등은 uploadFile 사용)
+    public String uploadImage(MultipartFile file, String folder) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new IllegalArgumentException("올바르지 않은 파일 이름입니다.");
+        }
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_IMAGE_EXTENSIONS.contains(extension)) {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
+        }
+        return uploadFile(file, folder);
+    }
 
     public String uploadFile(MultipartFile file, String folder) throws IOException {
         String key = folder + "/" + UUID.randomUUID() + "_" +file.getOriginalFilename();

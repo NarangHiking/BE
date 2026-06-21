@@ -6,6 +6,7 @@ import java.util.List;
 
 @Schema(description = "게시글 상세 조회에 필요한 DTO")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardDetailResponse {
@@ -21,6 +22,9 @@ public class BoardDetailResponse {
     @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1L")
     private Long trackId;
 
+    @Schema(description = "등산 코스 이름, 건의사항이 가리키는 코스명 (자유글이면 null)", example = "북한산성 코스")
+    private String trackName;
+
     @Schema(description = "게시글의 제목", example = "오늘의 등산 코스")
     private String title;
 
@@ -33,8 +37,11 @@ public class BoardDetailResponse {
     @Schema(description = "게시글에 달린 댓글 수", example = "1")
     private int commentCount;
 
-    @Schema(description = "게시글의 이미지들, 리스트 형태로 전달", example = "이미지1, 이미지2")
+    @Schema(description = "게시글의 이미지들 (R2 저장 키), 리스트 형태로 전달", example = "board/uuid1.jpg, board/uuid2.jpg")
     private List<String> images;
+
+    @Schema(description = "게시글 이미지들의 화면 표시용 공개 URL 리스트 (images 키로부터 생성)", example = "https://pub-xxxx.r2.dev/board/uuid1.jpg")
+    private List<String> imageUrls;
 
     @Schema(description = "게시글의 댓글들, 리스트 형태로 전달", example = "댓글1, 댓글2")
     private List<BoardCommentResponse> comments;

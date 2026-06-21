@@ -29,10 +29,12 @@
     </insert>
 
     <update id="update">
-        update users
-        set pass = #{pass},
-            name = #{name}
-        where id = #{userId}
+        UPDATE users
+        <set>
+            name = #{name},
+            <if test="pass != null and pass != ''">pass = #{pass},</if>
+        </set>
+        WHERE id = #{userId}
     </update>
 
     <update id="delete">

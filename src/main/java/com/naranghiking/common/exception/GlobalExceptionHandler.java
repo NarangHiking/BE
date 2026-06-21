@@ -53,6 +53,13 @@ public class GlobalExceptionHandler {
 				.body(ApiResult.fail("필수 정보가 누락되었습니다."));
 	}
 
+	@ExceptionHandler(IllegalArgumentException.class) // 잘못된 입력값(필수 누락, 허용되지 않은 값 등)
+	public ResponseEntity<ApiResult<Void>> handleIllegalArgument(IllegalArgumentException e) {
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(ApiResult.fail(e.getMessage()));
+	}
+
 	@ExceptionHandler(NoSuchElementException.class) // 해당 컨텐트가 없을 경우 넘어옴
 	public ResponseEntity<ApiResult<Void>> handleNotFoundExceptions(NoSuchElementException e) {
 		return ResponseEntity
