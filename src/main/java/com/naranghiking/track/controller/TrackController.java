@@ -7,6 +7,7 @@ import com.naranghiking.track.dto.TrackCondition;
 import com.naranghiking.track.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,16 @@ public class TrackController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND) // UNAUTHORIZED → NOT_FOUND
                     .body(ApiResult.fail("해당 아이디의 경로를 찾을 수 없습니다."));
         return ResponseEntity.ok(ApiResult.success(track));
+    }
+
+    @PostMapping(value = "/bulk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResult> bulkInsert(
+            @RequestPart("tracks") List<Track> tracks,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files
+    ) {
+        // files[i] ↔ tracks[i] 순서로 매칭. 하나라도 실패하면 전부 롤백(R2 보상 삭제 포함)
+        List<Track> result = trackService.bulkInsert(tracks, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.success(result));
     }
 
     @PostMapping

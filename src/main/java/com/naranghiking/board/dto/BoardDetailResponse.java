@@ -22,6 +22,9 @@ public class BoardDetailResponse {
     @Schema(description = "등산 코스 ID, 건의사항일 때만 선택하도록 한다.", example = "1L")
     private Long trackId;
 
+    @Schema(description = "등산 코스 이름, 건의사항이 가리키는 코스명 (자유글이면 null)", example = "북한산성 코스")
+    private String trackName;
+
     @Schema(description = "게시글의 제목", example = "오늘의 등산 코스")
     private String title;
 

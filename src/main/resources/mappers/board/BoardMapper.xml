@@ -7,6 +7,7 @@
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="track_id" property="trackId"/>
+        <result column="trackName" property="trackName"/>
         <result column="title" property="title"/>
         <result column="content" property="content"/>
         <result column="category" property="category"/>
@@ -19,6 +20,7 @@
 <!--  게시글 전체 조회  -->
     <select id="selectAll" resultType="BoardListResponse">
         SELECT b.id, u.name, b.title, b.category,
+               b.track_id AS trackId, t.name AS trackName,
                -- 날짜 포맷
                DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
                -- 댓글 수
@@ -30,7 +32,9 @@
                   FROM board_images bi
                  WHERE bi.board_id = b.id
                  LIMIT 1) AS image
-          FROM boards b JOIN users u ON b.user_id = u.id
+          FROM boards b
+               JOIN users u ON b.user_id = u.id
+               LEFT JOIN tracks t ON b.track_id = t.id
         <where>
             <if test="keyword != null"> <!--키워드로 탐색-->
                 (title LIKE CONCAT('%', #{keyword}, '%')) OR
@@ -45,14 +49,16 @@
     </select>
 <!--  게시글 단건 조회  -->
     <select id="selectById" resultMap="BoardDetailMap">
-        SELECT b.id, b.user_id, u.name, b.track_id, b.title, b.content, b.category,
+        SELECT b.id, b.user_id, u.name, b.track_id, t.name AS trackName, b.title, b.content, b.category,
                -- 날짜 포맷
                DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
                -- 댓글 수
                (SELECT count(*)
                 FROM board_comments bc
                 WHERE bc.board_id = b.id) AS comment_count
-          FROM boards b JOIN users u ON b.user_id = u.id
+          FROM boards b
+               JOIN users u ON b.user_id = u.id
+               LEFT JOIN tracks t ON b.track_id = t.id
          WHERE b.id = #{id}
            AND b.deleted_at IS NULL
     </select>

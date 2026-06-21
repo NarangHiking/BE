@@ -4,6 +4,7 @@ import com.naranghiking.weather.dto.KmaApiResponse;
 import com.naranghiking.weather.dto.MtnGrid;
 import com.naranghiking.weather.dto.WeatherResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WeatherService {
@@ -41,7 +43,7 @@ public class WeatherService {
                 .queryParam("serviceKey", apiKey)
                 .queryParam("pageNo", 1)
                 .queryParam("numOfRows", 1000)
-                .queryParam("dateType", "JSON")
+                .queryParam("dataType", "JSON")
                 .queryParam("base_date", base[0])
                 .queryParam("base_time", base[1])
                 .queryParam("nx", grid.getNx())

@@ -27,6 +27,12 @@ public class BoardListResponse {
     @Schema(description = "게시글의 카테고리, 자유 또는 건의사항", example = "free or feedback")
     private String category;
 
+    @Schema(description = "건의사항이 가리키는 등산 코스 ID (자유글이면 null)", example = "1")
+    private Long trackId;
+
+    @Schema(description = "건의사항이 가리키는 등산 코스 이름 (자유글이면 null)", example = "북한산성 코스")
+    private String trackName;
+
     @Schema(description = "게시글의 이미지, 대표 이미지로 한 장만 표시 (R2 저장 키)", example = "board/uuid_이미지1.jpg")
     private String image;
 
