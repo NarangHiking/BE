@@ -31,7 +31,7 @@ jobs: # develop에 업데이트가 감지되면 수행되는 job들
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "BE/target/*.jar"
           target: "/home/ec2-user/"
-#          strip_components: 1 # 다른 경로는 빼고 target/*.jar만 챙기기
+          strip_components: 1 # 다른 경로는 빼고 target/*.jar만 챙기기
 
       - name: 서버 재시작 (SSH)
         uses: appleboy/ssh-action@master # 원격 서버에 명령을 내릴 수 있게 해주는 도구
