@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS mountains (
     location VARCHAR(255) NOT NULL ,
     height BIGINT NOT NULL ,
     description TEXT NOT NULL,
+    lat DECIMAL(9,6),
+    lng DECIMAL(9,6),
+    image_source VARCHAR(255),
     original_filename varchar(255),
     stored_filename varchar(255)
 );

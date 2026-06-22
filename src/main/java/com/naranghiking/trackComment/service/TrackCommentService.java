@@ -18,4 +18,6 @@ public interface TrackCommentService {
     void delete(Long userId, Long commentId);
     // 후기 수정
     void update(@Valid TrackCommentRequest comment, List<MultipartFile> addedImages, List<String> deletedImages);
+    // 후기 내용만 수정 (이미지 없이 인라인 텍스트 수정용)
+    void updateContent(@Valid TrackCommentRequest comment);
 }

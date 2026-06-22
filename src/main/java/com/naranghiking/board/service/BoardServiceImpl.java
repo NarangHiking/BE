@@ -94,7 +94,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public BoardDetailResponse update(Long id, BoardRequest board, List<MultipartFile> addedImages, List<String> deletedImages) {
         BoardDetailResponse selected = selectById(id); // null이면 알아서 에러 처리됨
-        if(selected.getUserId() != board.getUserId()) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생
+        if(!selected.getUserId().equals(board.getUserId())) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생 (Long 은 equals 로 비교)
             throw new AccessDeniedException("수정 권한이 없습니다. 본인의 게시글만 수정이 가능합니다.");
         }
         validateFeedbackTrack(board);
@@ -120,7 +120,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void deleteById(Long id, Long userId) {
         BoardDetailResponse selected = selectById(id);
-        if(selected.getUserId() != userId) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생
+        if(!selected.getUserId().equals(userId)) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생 (Long 은 equals 로 비교)
             throw new AccessDeniedException("수정 권한이 없습니다. 본인의 게시글만 수정이 가능합니다.");
         }
 
