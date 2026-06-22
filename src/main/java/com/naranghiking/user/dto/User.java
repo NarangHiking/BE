@@ -18,7 +18,7 @@ public class User {
     private String name;
     private String role;
     private LocalDateTime createdAt;
-    private LocalDateTime removedAt;
+    private LocalDateTime deletedAt;
 
     public UserResponse toResponse() {
         return new UserResponse(email, name, role, createdAt);

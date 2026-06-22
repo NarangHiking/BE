@@ -21,6 +21,7 @@
 
     <select id="selectAll">
         select email, name, role, created_at from users
+        where deleted_at is null
     </select>
 
     <insert id="insert">

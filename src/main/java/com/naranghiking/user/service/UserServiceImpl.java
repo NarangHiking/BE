@@ -84,8 +84,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long userId, String accessToken) {
-        User user = userDao.select(userId);
-        if (user == null || user.getRemovedAt() != null) {
+        User user = userDao.findById(userId); // select 는 deleted_at 을 가져오지 않으므로 select * 인 findById 사용
+        if (user == null || user.getDeletedAt() != null) {
             throw new UserNotFoundException("이미 탈퇴한 사용자입니다.");
         }
         tokenService.blacklistAccessToken(accessToken);

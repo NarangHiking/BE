@@ -23,10 +23,11 @@
                b.track_id AS trackId, t.name AS trackName,
                -- 날짜 포맷
                DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
-               -- 댓글 수
+               -- 댓글 수 (논리삭제된 댓글 제외)
                (SELECT count(*)
                   FROM board_comments bc
-                 WHERE bc.board_id = b.id) AS comment_count,
+                 WHERE bc.board_id = b.id
+                   AND bc.deleted_at IS NULL) AS comment_count,
                -- 저장된 이미지
                (SELECT stored_filename
                   FROM board_images bi
@@ -52,10 +53,11 @@
         SELECT b.id, b.user_id, u.name, b.track_id, t.name AS trackName, b.title, b.content, b.category,
                -- 날짜 포맷
                DATE_FORMAT(b.created_at, '%Y년%m월%d일, %H시%i분') AS created_at,
-               -- 댓글 수
+               -- 댓글 수 (논리삭제된 댓글 제외)
                (SELECT count(*)
                 FROM board_comments bc
-                WHERE bc.board_id = b.id) AS comment_count
+                WHERE bc.board_id = b.id
+                  AND bc.deleted_at IS NULL) AS comment_count
           FROM boards b
                JOIN users u ON b.user_id = u.id
                LEFT JOIN tracks t ON b.track_id = t.id

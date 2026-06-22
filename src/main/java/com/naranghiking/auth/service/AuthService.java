@@ -24,7 +24,7 @@ public class AuthService {
     public TokenResponse login(LoginRequest request) {
 
         User user = userServiceImpl.findByEmail(request.getEmail());
-        if (user == null)
+        if (user == null || user.getDeletedAt() != null) // 탈퇴(논리삭제)한 회원은 로그인 불가
             throw new UserNotFoundException("사용자를 찾을 수 없습니다");
 
         System.out.println("rawPassword: " + request.getPass());
