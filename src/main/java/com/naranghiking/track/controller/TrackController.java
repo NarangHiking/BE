@@ -6,7 +6,10 @@ import com.naranghiking.track.dto.Track;
 import com.naranghiking.track.dto.TrackCondition;
 import com.naranghiking.track.service.TrackService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/track")
@@ -94,8 +98,13 @@ public class TrackController {
         if (target == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResult.fail("해당 경로가 존재하지 않습니다."));
-        r2Service.deleteFile(target.getGpxFilePath() );
-        trackService.delete(id);
+        try {
+            r2Service.deleteFile(target.getGpxFilePath() );
+        } catch (Exception e) {
+            log.warn("gpx 파일이 존재하지 않습니다.");
+        } finally {
+            trackService.delete(id);
+        }
         return ResponseEntity.ok(ApiResult.success("ok"));
     }
 }
