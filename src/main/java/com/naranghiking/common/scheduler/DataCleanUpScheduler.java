@@ -26,8 +26,8 @@ public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 
     private final UserDao userDao;
     private final TrackCommentDao trackCommentDao;
 
-    @Scheduled(fixedDelay = 60_000) // 60초마다 수행
-//    @Scheduled(cron = "0 0 3 * * *") // 초 분 시 일 월 요일
+//    @Scheduled(fixedDelay = 60_000) // 60초마다 수행
+    @Scheduled(cron = "0 0 3 * * *") // 초 분 시 일 월 요일
     @Transactional
     public void cleanUpBoard() {
         log.info("[Board 스케줄러 시작] 논리적 삭제로 이루어졌던 데이터들 물리적 삭제 실시!!!!!!!");

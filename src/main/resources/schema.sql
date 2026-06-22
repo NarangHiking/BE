@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS tracks;
 -- 외래키가 없는 테이블
 DROP TABLE IF EXISTS mountains;
 DROP TABLE IF EXISTS users;
-
+-- fix
 
 CREATE TABLE IF NOT EXISTS users (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS mountains (
     stored_filename varchar(255)
 );
 
-# 
 CREATE TABLE IF NOT EXISTS tracks (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
     mountain_id BIGINT NOT NULL ,
