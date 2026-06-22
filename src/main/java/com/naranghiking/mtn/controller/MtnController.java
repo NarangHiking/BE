@@ -109,11 +109,16 @@ public class MtnController {
         }
 
         if (file != null && !file.isEmpty()) {
-            r2Service.deleteFile(target.getStoredFilename());
-            String originalFilename = file.getOriginalFilename();
-            String storedFilename = r2Service.uploadFile(file, "images/mtn");
-            mtn.setOriginalFilename(originalFilename);
-            mtn.setStoredFilename(storedFilename);
+            // 기존 이미지가 있을 때만 삭제 (없으면 null 키로 R2 호출돼 "Parameter 'Key' must not be null" 발생)
+            if (target.getStoredFilename() != null && !target.getStoredFilename().isBlank()) {
+                r2Service.deleteFile(target.getStoredFilename());
+            }
+            mtn.setOriginalFilename(file.getOriginalFilename());
+            mtn.setStoredFilename(r2Service.uploadFile(file, "images/mtn"));
+        } else {
+            // 새 파일이 없으면 기존 파일명을 유지 (update 시 null 로 덮어쓰지 않도록)
+            mtn.setOriginalFilename(target.getOriginalFilename());
+            mtn.setStoredFilename(target.getStoredFilename());
         }
 
 
