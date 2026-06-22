@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS mountains (
     stored_filename varchar(255)
 );
 
+# 
 CREATE TABLE IF NOT EXISTS tracks (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
     mountain_id BIGINT NOT NULL ,
