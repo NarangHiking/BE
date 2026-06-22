@@ -33,7 +33,9 @@
             description = #{description},
             lat = #{lat},
             lng = #{lng},
-            image_source = #{imageSource}
+            image_source = #{imageSource},
+            original_filename = #{originalFilename},
+            stored_filename = #{storedFilename}
         where id = #{id}
     </update>
 
