@@ -108,6 +108,17 @@ public class TrackCommentServiceImpl implements TrackCommentService {
 
     @Transactional
     @Override
+    public void updateContent(TrackCommentRequest comment) {
+        Long selected = selectById(comment.getId()); // 없으면 404
+        if(!selected.equals(comment.getUserId())) { // 작성자 불일치 > 403
+            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 후기만 수정 가능합니다.");
+        }
+        int result = trackCommentDao.update(comment);
+        if(result == 0) throw new RuntimeException("후기 수정 중 오류 발생");
+    }
+
+    @Transactional
+    @Override
     public void delete(Long userId, Long commentId) {
         // commentId로 후기 가져오기
         Long selected = selectById(commentId);

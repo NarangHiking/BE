@@ -37,7 +37,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     @Override
     public BoardCommentResponse update(BoardCommentRequest comment) {
         BoardCommentResponse selected = selectById(comment.getId()); // 댓글이 존재하지 않으면 알아서 404
-        if(selected.getUserId() != comment.getUserId()) { // userId 불일치 > 403 에러
+        if(!selected.getUserId().equals(comment.getUserId())) { // userId 불일치 > 403 에러 (Long 은 equals 로 비교)
             throw new AccessDeniedException("수정 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
         }
 
@@ -50,7 +50,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     @Override
     public void delete(Long commentId, Long userId) {
         BoardCommentResponse selected = selectById(commentId); // 댓글이 존재하지 않으면 알아서 404
-        if(selected.getUserId() != userId) { // userId 불일치 > 403 에러
+        if(!selected.getUserId().equals(userId)) { // userId 불일치 > 403 에러 (Long 은 equals 로 비교)
             throw new AccessDeniedException("수정 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
         }
 

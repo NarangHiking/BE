@@ -89,6 +89,29 @@ public class TrackCommentController {
     }
 
 
+    @Operation(summary = "코스 후기 내용 수정", description = "이미지 없이 후기 내용(content)만 JSON으로 수정하는 요청 처리")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "후기 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "후기 수정 실패, 필수 정보 누락"),
+            @ApiResponse(responseCode = "403", description = "후기 수정 실패, 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "후기 수정 실패, 해당 후기가 존재하지 않음"),
+            @ApiResponse(responseCode = "500", description = "후기 수정 실패, 서버 문제")
+    })
+    @PatchMapping("/{commentId}") // 후기 내용만 수정 (JSON { content })
+    public ResponseEntity<ApiResult<String>> updateContent(
+            @Parameter(description = "작성자의 ID", example = "1L")
+            @AuthenticationPrincipal Long userId,
+            @Parameter(description = "수정할 후기의 ID", example = "1L")
+            @PathVariable("commentId") Long commentId,
+            @Parameter(description = "후기 내용", example = "{ \"content\": \"수정된 후기\" }")
+            @Valid @RequestBody TrackCommentRequest comment) {
+        comment.setUserId(userId);
+        comment.setId(commentId);
+        trackCommentService.updateContent(comment);
+        return ResponseEntity.ok(ApiResult.success("수정 완료"));
+    }
+
+
     @Operation(summary = "코스 후기 삭제", description = "코스 후기를 논리적으로 삭제하는 요청 처리")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "코스 후기 삭제 성공"),

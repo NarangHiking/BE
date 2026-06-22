@@ -21,8 +21,8 @@
     </select>
     <!-- 산 정보 삽입 -->
     <insert id="insert">
-        insert into mountains (name, location, height, description, original_filename, stored_filename)
-        values (#{name}, #{location}, #{height}, #{description}, #{originalFilename}, #{storedFilename})
+        insert into mountains (name, location, height, description, lat, lng, image_source, original_filename, stored_filename)
+        values (#{name}, #{location}, #{height}, #{description}, #{lat}, #{lng}, #{imageSource}, #{originalFilename}, #{storedFilename})
     </insert>
 
     <update id="update">
@@ -30,7 +30,10 @@
         set name = #{name},
             location = #{location},
             height = #{height},
-            description = #{description}
+            description = #{description},
+            lat = #{lat},
+            lng = #{lng},
+            image_source = #{imageSource}
         where id = #{id}
     </update>
 

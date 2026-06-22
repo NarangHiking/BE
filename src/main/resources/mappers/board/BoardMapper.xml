@@ -72,7 +72,7 @@
     </select>
     <!--  게시글 단건 조회에 필요한 댓글들 가져오기  -->
     <select id="selectCommentsByBoardId" resultType="BoardCommentResponse">
-        SELECT bc.id, u.name, bc.content,
+        SELECT bc.id, bc.user_id, u.name, bc.content,
                -- 날짜 포맷
                DATE_FORMAT(bc.created_at, '%Y년%m월%d일, %H시%i분') AS created_at
           FROM board_comments bc JOIN users u ON bc.user_id = u.id

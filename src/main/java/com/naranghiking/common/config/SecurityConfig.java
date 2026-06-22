@@ -75,6 +75,9 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(permitUrls).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/mtn/**", "/api/track/**", "/api/weather/**", "/api/sun/**").permitAll()
+                        // 코스 후기(댓글)의 작성/수정/삭제는 코스 관리(ADMIN 전용)와 달리, 로그인한 사용자면 누구나 가능.
+                        // adminUrls(/api/track/**)의 POST/PUT/PATCH/DELETE 매처보다 먼저 와야 ADMIN 강제에 걸리지 않음.
+                        .requestMatchers("/api/track/*/comment", "/api/track/*/comment/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/list").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, adminUrls).hasRole("ADMIN")

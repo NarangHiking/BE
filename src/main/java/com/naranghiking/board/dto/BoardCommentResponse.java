@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Schema(description = "게시글의 댓글 조회를 위한 DTO")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class BoardCommentResponse {
     @Schema(description = "댓글의 ID, 해당 댓글을 선택할 때 필요", example = "1")
     private Long id;
