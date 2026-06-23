@@ -30,7 +30,7 @@ public class ChatbotController {
             @AuthenticationPrincipal Long userId,
             @Parameter(description = "사용자의 질문", example = "가볍게 즐기기 좋은 한라산 코스 추천해줘")
             @Valid @RequestBody ChatbotRequest request) {
-        String result = chatbotService.chat(userId.toString(), request.message());
+        String result = chatbotService.chat(userId.toString(), request.message(), request.mountainId());
         return ResponseEntity.ok(ApiResult.success(result));
     }
 }

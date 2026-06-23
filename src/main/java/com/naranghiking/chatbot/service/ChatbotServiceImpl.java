@@ -2,12 +2,19 @@ package com.naranghiking.chatbot.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.naranghiking.chatbot.chain.FinalResponseChain;
+import com.naranghiking.chatbot.chain.InfoFilterChain;
+import com.naranghiking.chatbot.chain.IntentRouterChain;
+import com.naranghiking.chatbot.dao.ChatbotDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -19,13 +26,17 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChatbotServiceImpl implements ChatbotService{
+public class ChatbotServiceImpl implements ChatbotService {
 
     private static final String REDIS_KEY_PREFIX = "chat:session:"; // REDIS에 올릴 때 사용할 키의 앞부분
     private static final long SESSION_TIMEOUT_LIMIT = 30; // 대화 내용 기억 시간(30분)
     private static final int MAX_HISTORY_SIZE = 10; // 사용자의 질문 5개, 답면 5개 조회
     private static final double SCORE_PIVOT = 0.3;  // 해당 수치보다 낮은 유사도는 엉뚱한 대답으로 간주
 
+    private final ChatbotDao chatbotDao;
+    private final IntentRouterChain intentRouterChain;  // 사용자 의도 분류
+    private final InfoFilterChain infoFilterChain;      // 정보 정제
+    private final FinalResponseChain finalResponseChain;// 최종 답변 생성
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
@@ -38,19 +49,21 @@ public class ChatbotServiceImpl implements ChatbotService{
     private String gmsKey; // gms api key
     @Value("${gms.embedding-url}")
     private String embeddingURL; // gms의 임베딩 url
-    @Value("${gms.chat-url}")
-    private String gmsChatURL; // 대화를 나누기 위한 url
 
-    @Override // 메인 챗봇 실행
-    public String chat(String userId, String userMessage) {
+    @Override
+    public String chat(String userId, String userMessage, Long mountainId) {
         String key = REDIS_KEY_PREFIX + userId; // 사용자의 아이디
 
         try {
-            log.info("[ChatbotService] RAG 기반 응답 시작!!!!!");
+            log.info("[ChatbotService] ===== LLM 체이닝 기반 응답 시작 =====");
+
+            String mountain = chatbotDao.getMountainNameById(mountainId); // 산 id를 통해 사용자가 보고 있는 산의 이름을 반환
+            log.info("[ChatbotService] 사용자가 조회 중인 산: {}", mountain);
+
             // 1. Redis에서 이전 대화 기록 가져오기 (문맥 유지) List의 시작(MAX...)부터 끝(-1), redis 문법임
             // jsons의 String에는 json 형식이 통째로 문자열로 들어가있음
             List<String> jsons = redisTemplate.opsForList().range(key, -MAX_HISTORY_SIZE, -1);
-            log.info("[ChatbotService] 사용자의 대화 기록 조회 완료");
+            log.info("[ChatbotService] Redis에서 사용자의 대화 기록 조회 완료");
             List<Map<String, String>> histories = new ArrayList<>();
             if(jsons != null) {
                 for(String json : jsons) { // 값을 하나씩 뽑아서 histories에 넣어주자
@@ -58,39 +71,32 @@ public class ChatbotServiceImpl implements ChatbotService{
                 }
             }
 
-            // 2. 유저 질문을 임베딩(숫자 벡터)으로 변환 (GMS API)
-            List<Double> vector = getEmbeddingFromGMS(userMessage); // 유사도 검색을 위해 메시지 임베딩
-            log.info("[ChatbotService] 사용자의 메시지 임베딩 완료");
+            // a. 사용자 의도 분석 (Chainning)
+            String intent = intentRouterChain.analyzeIntent(userMessage);
+            log.info("[ChatbotService, Chain 1] 사용자 의도 분석 완료: {}", intent);
 
-            // 3. Pinecone에서 가장 유사한 등산 코스 정보 검색 (Top 2개)
-            String searchResult = queryPinecone(vector); // vector db에서 유사도를 검색, 문장 리턴
-            log.info("[ChatbotService] 임베딩 메시지의 vector db 유사도 검색 완료");
+            String contextInfo = "";
 
-            // 4. 시스템 프롬프트 조립 (검색된 정보 + 이전 대화 기록)
-            String prompt =
-                    "너는 전 세계의 모든 산을 탐험한 경험이 있는 친절한 등산 전문가야.\n" +
-                    "사용자의 등산 관련 질문에 대해 아래 [참고자료]와 [대화기록]을 기반으로 답변해줘.\n\n" +
-                    "[답변 작성 필수 규칙] - 이하 내용 반드시 지킬 것\n" +
-                    "1. 형식: 마크다운(##, ** 등)을 절대 사용하지 말고, 읽기 편한 일반 텍스트로 작성할 것.\n" +
-                    "2. 분량: 불필요한 말은 빼고 핵심만 담아 적당한 길이로 대답할 것.\n" +
-                    "3. 명칭 정확성: 코스를 추천할 때, [참고자료]에 기록된 공식 코스 이름(예: '팔공산_1번코스', '팔공산_2번코스' 등)을 임의로 변형하지 말고 그대로 정확히 출력할 것.\n" +
-                    "4. 내용: 자잘한 경유지들을 기계적으로 모두 나열하지 말고, 해당 코스의 이름과 특징 위주로 자연스럽게 추천할 것.\n" +
-                    "5. 정보의 엄격한 통제: 코스를 추천할 때는 무조건 [참고자료]에 존재하는 코스만 추천해. 개인적으로 알고 있는 다른 산이나 코스를 절대로 지어내거나 추가하지 말 것.\n\n" +
-                    "[참고자료]\n" + searchResult + "\n\n" +
-                    "[대화기록]\n" + histories;
-            log.info("[ChatbotService] 프롬프트 생성 완료 - searchResult: {}", searchResult);
-            log.info("[ChatbotService] 프롬프트 생성 완료 - histories: {}", histories);
+            if("COURSE_SEARCH".equals(intent)) { // 코스 관련 질문일 때만 Pinecone 조회
+                // 2. 유저 질문을 임베딩(숫자 벡터)으로 변환 (GMS API)
+                List<Double> vector = getEmbeddingFromGMS(mountain + " " + userMessage); // 유사도 검색을 위해 메시지 임베딩
+                log.info("[ChatbotService] 사용자의 메시지 임베딩 완료");
 
-            // 5. GMS(LLM)에 최종 답변 요청
-            List<Map<String, String>> messagesToChatbot = new ArrayList<>();
-            messagesToChatbot.add(Map.of("role", "system", "content", prompt));
-            messagesToChatbot.addAll(histories);
-            messagesToChatbot.add(Map.of("role", "user", "content", userMessage));
+                // 3. Pinecone에서 가장 유사한 등산 코스 정보 검색 (Top 4개)
+                String searchResult = queryPinecone(vector); // vector db에서 유사도를 검색, 문장 리턴
+                log.info("[ChatbotService] 임베딩 메시지의 vector db 유사도 검색 완료");
 
-            String answer = callChatbot(messagesToChatbot); // 프롬프트와 사용자 메시지를 통해서 답변 생성
-            log.info("[ChatbotService] 답변 생성 완료");
+                // b. 정보 정제 (Chainning)
+                contextInfo = infoFilterChain.filterContext(userMessage, searchResult);
+                log.info("[ChatbotService, Chain 2] Pinecone에서 조회한 데이터 중 중요한 것만 추출 완료");
+            } else {
+                log.info("[ChatbotService] 코스 관련 질문이 아니므로, 사용자 메시지 임베딩 생략");
+            }
 
-            // 6. Redis에 새로운 대화 내역 업데이트 및 수명(TTL) 30분 연장
+            // c. 최종 답변 생성 (Chainning)
+            String answer = finalResponseChain.generateResponse(mountain, userMessage, contextInfo, histories);
+
+            // 4. Redis에 새로운 대화 내역 업데이트 및 수명(TTL) 30분 연장
             String userJson = objectMapper.writeValueAsString(Map.of("role", "user", "content", userMessage));
             String chatbotJson = objectMapper.writeValueAsString(Map.of("role", "assistant", "content", answer));
 
@@ -103,7 +109,7 @@ public class ChatbotServiceImpl implements ChatbotService{
 
             return answer;
 
-        } catch (Exception e) { // 모든 예외에 대해 동일 메시지 전달
+        } catch (Exception e) {
             log.error("[ChatbotService] 요청 처리 중 에러 발생 : ", e);
             return "죄송합니다. 요청 처리 중 문제가 발생하였습니다.";
         }
@@ -141,7 +147,7 @@ public class ChatbotServiceImpl implements ChatbotService{
         // vector 정보를 넘겨서 그거 기반으로 가장 유사한 코스 2개 조회해보자
         Map<String, Object> body = new HashMap<>();
         body.put("vector", vector);
-        body.put("topK", 5); // 가장 유사한 코스 2개 꺼내기
+        body.put("topK", 4); // 가장 유사한 코스 4개 꺼내기
         body.put("includeMetadata", true);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
@@ -162,22 +168,5 @@ public class ChatbotServiceImpl implements ChatbotService{
         }
 
         return context.toString();
-    }
-
-    private String callChatbot(List<Map<String, String>> messages) throws Exception { // 프롬프트와 사용자 메시지를 통해 답변 생성
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(gmsKey);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("model", "gpt-5.4-mini");
-        body.put("messages", messages);
-        body.put("temperature", 0.7);
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-        // url로 request(헤더랑 message)를 전송해서, String 응답을 받는다.
-        ResponseEntity<String> response = restTemplate.postForEntity(gmsChatURL, request, String.class);
-        // JSON으로 응답이 오는데 거기서 choices의 첫 번째 배열 중 message 안의 content를 추출
-        return objectMapper.readTree(response.getBody()).path("choices").get(0).path("message").path("content").asText();
     }
 }
