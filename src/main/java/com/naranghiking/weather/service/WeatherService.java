@@ -34,7 +34,7 @@ public class WeatherService {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    public List<WeatherResponse> getWeather(double lat, double lng, String fcstDate) {
+    public List<WeatherResponse> getWeather(double lat, double lng) {
         int[] grid = latLngToGrid(lat, lng);
         String[] base = resolveBaseDateTime();
 
