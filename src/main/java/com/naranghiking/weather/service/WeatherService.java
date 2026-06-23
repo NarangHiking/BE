@@ -60,14 +60,14 @@ public class WeatherService {
         }
 
         List<KmaApiResponse.Item> items = response.response().body().items().item();
-
-        Map<String, List<KmaApiResponse.Item>> byTime = items.stream()
-                .filter(i -> i.fcstDate().equals(fcstDate))
-                .collect(Collectors.groupingBy(
-                        KmaApiResponse.Item::fcstTime, TreeMap::new, Collectors.toList()));
-        return byTime.entrySet().stream()
-                .map(e -> toWeatherResponse(fcstDate, e.getKey(), e.getValue()))
-                .toList();
+        Map<String, Map<String, List<KmaApiResponse.Item>>> byDateAndTime = items.stream()
+        .collect(Collectors.groupingBy(
+                KmaApiResponse.Item::fcstDate, TreeMap::new,
+                Collectors.groupingBy(KmaApiResponse.Item::fcstTime, TreeMap::new, Collectors.toList())));
+        return byDateAndTime.entrySet().stream()
+                .flatMap(dateEntry -> dateEntry.getValue().entrySet().stream()
+                    .map(timeEntry-> toWeatherResponse(dateEntry.getKey(), timeEntry.getKey(), timeEntry.getValue()))
+                ).toList();
     }
 
     private WeatherResponse toWeatherResponse(String date, String time,
