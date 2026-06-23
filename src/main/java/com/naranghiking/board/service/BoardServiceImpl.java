@@ -155,6 +155,5 @@ public class BoardServiceImpl implements BoardService {
         }
 
         int result = boardDao.deleteById(id);
-        if(result == 0) throw new RuntimeException("게시글 삭제 중 오류 발생");
     }
 }
