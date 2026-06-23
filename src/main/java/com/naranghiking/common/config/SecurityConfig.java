@@ -75,7 +75,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(permitUrls).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/mtn/**", "/api/track/**", 
-                                                        "/api/weather/**", "/api/sun/**","/api/board", "/api/board/${id}").permitAll()
+                                                        "/api/weather/**", "/api/sun/**","/api/board", "/api/board/{id}").permitAll()
                         .requestMatchers("/api/track/*/comment", "/api/track/*/comment/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/list").hasRole("ADMIN")
