@@ -82,7 +82,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                 List<Double> vector = getEmbeddingFromGMS(mountain + " " + userMessage); // 유사도 검색을 위해 메시지 임베딩
                 log.info("[ChatbotService] 사용자의 메시지 임베딩 완료");
 
-                // 3. Pinecone에서 가장 유사한 등산 코스 정보 검색 (Top 4개)
+                // 3. Pinecone에서 가장 유사한 등산 코스 정보 검색 (Top 8개)
                 String searchResult = queryPinecone(vector); // vector db에서 유사도를 검색, 문장 리턴
                 log.info("[ChatbotService] 임베딩 메시지의 vector db 유사도 검색 완료");
 
@@ -147,7 +147,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         // vector 정보를 넘겨서 그거 기반으로 가장 유사한 코스 2개 조회해보자
         Map<String, Object> body = new HashMap<>();
         body.put("vector", vector);
-        body.put("topK", 4); // 가장 유사한 코스 4개 꺼내기
+        body.put("topK", 8); // 가장 유사한 정보 8개 꺼내기
         body.put("includeMetadata", true);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
