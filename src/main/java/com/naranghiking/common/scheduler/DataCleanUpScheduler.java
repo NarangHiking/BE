@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 데이터 삭제
 
-    final int EXPIRED_TIME = 1 * 60 * 24 * 90; // [1 = 1분], [1 * 60 * 24 * 90 = 90일]
+    final int EXPIRED_TIME = 1; // * 60 * 24 * 90; // [1 = 1분], [1 * 60 * 24 * 90 = 90일]
 
     private final BoardDao boardDao;
     private final BoardCommentDao boardCommentDao;
@@ -26,8 +26,8 @@ public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 
     private final UserDao userDao;
     private final TrackCommentDao trackCommentDao;
 
-//    @Scheduled(fixedDelay = 60_000) // 60초마다 수행
-    @Scheduled(cron = "0 0 3 * * *") // 초 분 시 일 월 요일
+    @Scheduled(fixedDelay = 60_000) // 60초마다 수행
+//    @Scheduled(cron = "0 0 3 * * *") // 초 분 시 일 월 요일
     @Transactional
     public void cleanUpBoard() {
         log.info("[Board 스케줄러 시작] 논리적 삭제로 이루어졌던 데이터들 물리적 삭제 실시!!!!!!!");
