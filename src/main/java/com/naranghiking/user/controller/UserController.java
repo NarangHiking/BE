@@ -56,6 +56,13 @@ public class UserController {
         return ResponseEntity.ok(ApiResult.success("ok"));
     }
 
+    @PatchMapping("/reset-password")
+    ResponseEntity<ApiResult> resetPassword(@RequestBody UpdateRequest request) {
+        userService.resetPassword(request);
+        return ResponseEntity.ok(ApiResult.success("ok"));
+    }
+
+
     @PatchMapping("/remove")
     ResponseEntity<ApiResult> remove(
             @AuthenticationPrincipal Long userId,

@@ -20,6 +20,8 @@ public interface UserDao {
 
     User findById(Long userId);
 
+    User findByEmailAndName(@Param("email") String email, @Param("name") String name);
+
     int insert(SignUpRequest request);
 
     int update(UpdateRequest request);

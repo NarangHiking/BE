@@ -78,6 +78,17 @@ public class UserServiceImpl implements UserService {
         return userDao.update(request);
     }
 
+    public int resetPassword(UpdateRequest request) {
+        User user = userDao.findByEmailAndName(request.getEmail(), request.getName());
+        if (user == null) {
+            throw new UserNotFoundException("해당 사용자가 존재하지 않습니다.");
+        }
+        request.setUserId(user.getId());
+        request.setName(user.getName());
+        request.setPass(passwordEncoder.encode(request.getPass()));
+        return userDao.update(request);
+    }
+
     public boolean checkPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }

@@ -5,8 +5,11 @@ import com.naranghiking.board.dto.BoardCommentRequest;
 import com.naranghiking.board.dto.BoardCommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.NoSuchElementException;
 
@@ -16,6 +19,12 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
     private final BoardCommentDao boardCommentDao;
 
+    
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+    }
 
     @Override
     public BoardCommentResponse selectById(Long id) {
@@ -50,7 +59,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     @Override
     public void delete(Long commentId, Long userId) {
         BoardCommentResponse selected = selectById(commentId); // 댓글이 존재하지 않으면 알아서 404
-        if(!selected.getUserId().equals(userId)) { // userId 불일치 > 403 에러 (Long 은 equals 로 비교)
+        if(!selected.getUserId().equals(userId) && !isAdmin()) { // userId 불일치 > 403 에러 (Long 은 equals 로 비교)
             throw new AccessDeniedException("수정 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
         }
 
