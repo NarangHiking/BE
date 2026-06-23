@@ -7,6 +7,7 @@ import com.naranghiking.board.dto.BoardRequest;
 import com.naranghiking.common.dto.ImageRequest;
 import com.naranghiking.common.service.R2Service;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
@@ -108,6 +110,7 @@ public class BoardServiceImpl implements BoardService {
         int result = boardDao.insert(board);
         if(result == 0) throw new RuntimeException("게시글 저장에 실패했습니다.");
 
+        log.info("[BoardServiceImple] 게시글 저장 성공!: {}", board);
         if(images != null && !images.isEmpty()) {
             List<ImageRequest> saveImages = uploadImages(images, board.getId());
 
