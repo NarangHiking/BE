@@ -18,7 +18,6 @@ import java.util.NoSuchElementException;
 public class BoardCommentServiceImpl implements BoardCommentService {
 
     private final BoardCommentDao boardCommentDao;
-
     
     private boolean isAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -60,7 +59,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     public void delete(Long commentId, Long userId) {
         BoardCommentResponse selected = selectById(commentId); // 댓글이 존재하지 않으면 알아서 404
         if(!selected.getUserId().equals(userId) && !isAdmin()) { // userId 불일치 > 403 에러 (Long 은 equals 로 비교)
-            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
+            throw new AccessDeniedException("삭제 권한이 없습니다. 본인의 댓글만 수정 가능합니다.");
         }
 
         int result = boardCommentDao.delete(commentId);

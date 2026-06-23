@@ -8,6 +8,8 @@ import com.naranghiking.trackComment.dto.TrackCommentListResponse;
 import com.naranghiking.trackComment.dto.TrackCommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +27,12 @@ public class TrackCommentServiceImpl implements TrackCommentService {
 
     private final TrackCommentDao trackCommentDao;
     private final R2Service r2Service;
+
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+    }
 
     // 후기 이미지들을 R2에 업로드하고 (원본명, R2 키) 목록을 만든다.
     private List<ImageRequest> uploadImages(List<MultipartFile> images) {
@@ -123,7 +131,7 @@ public class TrackCommentServiceImpl implements TrackCommentService {
         // commentId로 후기 가져오기
         Long selected = selectById(commentId);
         // comment.getUserId해서 userId와 맞는지 비교
-        if(selected == null || !selected.equals(userId)) throw new AccessDeniedException("삭제 권한이 없습니다. 본인의 후기만 삭제 가능합니다.");
+        if((selected == null || !selected.equals(userId)) && !isAdmin()) throw new AccessDeniedException("삭제 권한이 없습니다. 본인의 후기만 삭제 가능합니다.");
         // 맞으면 삭제 처리
         trackCommentDao.delete(commentId);
     }

@@ -26,7 +26,7 @@ public class DataCleanUpScheduler { // 테스트는 10초마다, 1분이 지난 
     private final UserDao userDao;
     private final TrackCommentDao trackCommentDao;
 
-    @Scheduled(fixedDelay = 600_000) // 60초마다 수행
+    @Scheduled(fixedDelay = 600_000) // 10분마다 수행
 //    @Scheduled(cron = "0 0 3 * * *") // 초 분 시 일 월 요일
     @Transactional
     public void cleanUpBoard() {
