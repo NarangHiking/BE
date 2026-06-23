@@ -37,6 +37,7 @@ public class SecurityConfig {
     String [] permitUrls = {
             "/api/auth/login",
             "/api/user/register",
+            "/api/user/reset-password",
             "/api/auth/reissue",
             "/api/error",
             "/api/board/**",

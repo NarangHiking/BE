@@ -8,9 +8,13 @@ import com.naranghiking.common.dto.ImageRequest;
 import com.naranghiking.common.service.R2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +49,12 @@ public class BoardServiceImpl implements BoardService {
             }
         }
         return result;
+    }
+
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
     }
 
     @Override
@@ -120,8 +130,8 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void deleteById(Long id, Long userId) {
         BoardDetailResponse selected = selectById(id);
-        if(!selected.getUserId().equals(userId)) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생 (Long 은 equals 로 비교)
-            throw new AccessDeniedException("수정 권한이 없습니다. 본인의 게시글만 수정이 가능합니다.");
+        if(!selected.getUserId().equals(userId) && !isAdmin()) { // 게시글 작성자와 수정 요청자가 다르면 403 에러 발생 (Long 은 equals 로 비교)
+            throw new AccessDeniedException("삭제 권한이 없습니다. 본인의 게시글만 수정이 가능합니다.");
         }
 
         int result = boardDao.deleteById(id);
