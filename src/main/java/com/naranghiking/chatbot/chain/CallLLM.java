@@ -33,7 +33,7 @@ public class CallLLM {
         headers.setBearerAuth(gmsKey);
 
         Map<String, Object> body = Map.of(
-                "model", "gpt-5.4-mini", // 기존 사용하던 모델과 동일하게 유지
+                "model", "gpt-5.5", // 기존 사용하던 모델과 동일하게 유지
                 "messages", messages,
                 "temperature", temperature
         );
