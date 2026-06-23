@@ -40,7 +40,6 @@ public class SecurityConfig {
             "/api/user/reset-password",
             "/api/auth/reissue",
             "/api/error",
-            "/api/board/**",
             "/swagger-ui/**",
             "/v3/api-docs/**"
     };
@@ -63,7 +62,7 @@ public class SecurityConfig {
             throw new UsernameNotFoundException(username);
         };
     }
-	
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         // REST API는 세션/쿠키를 사용하지 않으므로 CSRF 공격 방어를 끔
@@ -75,9 +74,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth-> auth
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(permitUrls).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/mtn/**", "/api/track/**", "/api/weather/**", "/api/sun/**").permitAll()
-                        // 코스 후기(댓글)의 작성/수정/삭제는 코스 관리(ADMIN 전용)와 달리, 로그인한 사용자면 누구나 가능.
-                        // adminUrls(/api/track/**)의 POST/PUT/PATCH/DELETE 매처보다 먼저 와야 ADMIN 강제에 걸리지 않음.
+                        .requestMatchers(HttpMethod.GET, "/api/mtn/**", "/api/track/**", 
+                                                        "/api/weather/**", "/api/sun/**","/api/board", "/api/board/${id}").permitAll()
                         .requestMatchers("/api/track/*/comment", "/api/track/*/comment/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/list").hasRole("ADMIN")
