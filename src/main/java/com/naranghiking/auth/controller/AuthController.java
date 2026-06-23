@@ -49,7 +49,7 @@ public class AuthController {
                 .secure(false) // 운영 배포 시 true로 변경
                 .path("/")
                 .maxAge(Duration.ofMinutes(15))
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         ResponseCookie refresh = ResponseCookie.from("refreshToken", refreshToken)
@@ -57,7 +57,7 @@ public class AuthController {
                 .secure(false)
                 .path("/api/auth")
                 .maxAge(Duration.ofDays(7))
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         resp.addHeader(HttpHeaders.SET_COOKIE, access.toString());

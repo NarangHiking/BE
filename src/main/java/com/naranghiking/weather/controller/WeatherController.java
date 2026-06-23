@@ -27,12 +27,8 @@ public class WeatherController {
         @GetMapping
         public ResponseEntity<ApiResult> getWeather(
                 @RequestParam double lat,
-                @RequestParam double lng,
-                @RequestParam(required = false) String fcstDate) {
-            if (fcstDate == null || fcstDate.isBlank()) {
-                fcstDate = LocalDate.now().format(DATE_FMT);
-            }
-            List<WeatherResponse> result = weatherService.getWeather(lat, lng, fcstDate);
+                @RequestParam double lng) {
+            List<WeatherResponse> result = weatherService.getWeather(lat, lng);
             return ResponseEntity.ok(ApiResult.success(result));
         }
 }
