@@ -132,7 +132,7 @@ public class BoardServiceImpl implements BoardService {
         int result = boardDao.update(id, board);
         if(result == 0) throw new RuntimeException("게시글 수정 중 오류 발생");
         if(addedImages != null && !addedImages.isEmpty()) {
-            List<ImageRequest> saveImages = uploadImages(addedImages, board.getId());
+            List<ImageRequest> saveImages = uploadImages(addedImages, id);
             if(!saveImages.isEmpty()) {
                 boardDao.insertImages(id, saveImages);
             }
