@@ -37,19 +37,36 @@ public class BoardServiceImpl implements BoardService {
         }
     }
 
-    private List<ImageRequest> uploadImages(List<MultipartFile> images) {
-        List<ImageRequest> result = new ArrayList<>();
+//    private List<ImageRequest> uploadImages(List<MultipartFile> images) {
+//        List<ImageRequest> result = new ArrayList<>();
+//        for (MultipartFile file : images) {
+//            if (file.isEmpty()) continue;
+//            try {
+//                String key = r2Service.uploadImage(file, IMAGE_FOLDER);
+//                result.add(new ImageRequest(file.getOriginalFilename(), key));
+//            } catch (IOException e) {
+//                throw new RuntimeException("이미지 업로드 중 에러 발생", e);
+//            }
+//        }
+//        return result;
+//    }
+    private List<ImageRequest> uploadImages(List<MultipartFile> images, Long boardId) {
+        List<ImageRequest> uploaded = new ArrayList<>();
         for (MultipartFile file : images) {
             if (file.isEmpty()) continue;
             try {
-                String key = r2Service.uploadImage(file, IMAGE_FOLDER);
-                result.add(new ImageRequest(file.getOriginalFilename(), key));
+                String storedName = r2Service.uploadImage(file, IMAGE_FOLDER + "/" + boardId);
+                uploaded.add(new ImageRequest(file.getOriginalFilename(), storedName));
             } catch (IOException e) {
+                for (ImageRequest img : uploaded) {
+                    try { r2Service.deleteFile(img.getStoredFilename()); } catch (Exception ignored) {}
+                }
                 throw new RuntimeException("이미지 업로드 중 에러 발생", e);
             }
         }
-        return result;
+        return uploaded;
     }
+
 
     private boolean isAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -92,7 +109,7 @@ public class BoardServiceImpl implements BoardService {
         if(result == 0) throw new RuntimeException("게시글 저장에 실패했습니다.");
 
         if(images != null && !images.isEmpty()) {
-            List<ImageRequest> saveImages = uploadImages(images);
+            List<ImageRequest> saveImages = uploadImages(images, board.getId());
 
             if(!saveImages.isEmpty()) { // 성공적으로 값이 전달되면 DB에 저장
                 boardDao.insertImages(board.getId(), saveImages);
@@ -112,7 +129,7 @@ public class BoardServiceImpl implements BoardService {
         int result = boardDao.update(id, board);
         if(result == 0) throw new RuntimeException("게시글 수정 중 오류 발생");
         if(addedImages != null && !addedImages.isEmpty()) {
-            List<ImageRequest> saveImages = uploadImages(addedImages);
+            List<ImageRequest> saveImages = uploadImages(addedImages, board.getId());
             if(!saveImages.isEmpty()) {
                 boardDao.insertImages(id, saveImages);
             }
