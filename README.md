@@ -1,4 +1,72 @@
-.
+# 나랑등산 BE 🥾
+
+## 팀원별 기여 내역
+
+### 👤 황우찬 (cmy397264)
+
+#### 🔐 인증/인가
+- JWT 토큰 기반 로그인·로그아웃·회원가입 구현
+- accessToken + refreshToken 이중 토큰 구조 설계
+- 토큰 저장 방식을 LocalStorage → HttpOnly Cookie로 전환
+- Spring Security 설정 및 권한별 API 접근 제어
+- 관리자(ADMIN) 권한 확대 (게시글·댓글 수정/삭제 권한)
+- 비밀번호 재설정 기능 구현
+
+#### 🏔 산/코스 관리
+- 산(Mountain) CRUD API 및 MyBatis 매퍼 구현
+- 코스(Track) API, GPX 일괄 등록 기능
+- GPX 파일 미존재 시 무시 후 삭제 처리
+- DTO 설계 및 schema 설계/수정
+
+#### ☁️ 인프라/스토리지
+- Cloudflare R2 이미지 스토리지 연동
+- CORS 설정 및 프론트엔드 배포 도메인 추가
+- 모든 API 경로에 `/api` prefix 추가
+
+#### ⭐ 즐겨찾기/추천
+- 코스 즐겨찾기 CRUD (POST/DELETE/GET `/favorite/{trackId}`)
+- 코스 추천 CRUD (POST/DELETE/GET `/recommend/{trackId}`)
+
+#### 🌤 날씨 API
+- 기상청 단기예보 API 연동
+- 위경도 → 격자좌표 변환(LCC) 구현으로 DB 기반 날씨 조회
+
+#### 👤 사용자
+- 회원가입, 유저 조회, 정보 수정 API
+- `UserResponse` DTO 분리 (비밀번호 노출 방지)
+
+#### 🧪 테스트
+- 단위 테스트(AuthService, TokenService) / 통합 테스트 분리
+- FavoriteController, Mountain, User 테스트 작성
+
+---
+
+### 👤 박승진 (jamonda1)
+
+#### 📝 게시판
+- 게시글 CRUD (생성, 조회, 수정, 삭제) 전체 구현
+- 게시글 삭제 방식 Hard delete → Soft delete(논리적 삭제) 전환
+- 게시글 이미지 첨부, 키워드·카테고리 기반 동적 검색 쿼리
+- 게시글 댓글 CRUD (작성, 수정, 삭제) 구현
+
+#### 🥾 코스 후기
+- 트랙(코스)별 후기 CRUD 구현 (이미지 첨부 포함)
+- 401 유효하지 않은 토큰 에러 처리
+
+#### 🤖 AI 챗봇 (RAG)
+- 사용자 메시지 임베딩 → Vector DB 유사도 검색 로직 구현
+- LLM 체이닝 로직 설계 및 구현
+- 챗봇 Controller/Service 완성, 프롬프트 최적화
+- 사용자가 조회 중인 산 이름 컨텍스트 활용
+
+#### ⚙️ 인프라/운영
+- GitHub Actions CI/CD 파이프라인 설정
+- AWS RDS 세팅
+- 논리적 삭제 데이터 물리적 삭제 스케줄러 구현 (10분 주기)
+- `ApiResult` 공통 응답 포맷 + `GlobalExceptionHandler` 적용
+
+---
+
 # 개발일지 - 2026년 6월 4일
 
 ### ⭐ 즐겨찾기(Favorite) 기능 구현
