@@ -32,8 +32,11 @@ public class CallLLM {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(gmsKey);
 
+        // 사용자 의도 분류 시에만 고급 모델 사용
+        String model = (step == 1) ? "gpt-5.4" : "gpt-5.4-mini";
+
         Map<String, Object> body = Map.of(
-                "model", "gpt-5.4-mini", // 기존 사용하던 모델과 동일하게 유지
+                "model", model, // 기존 사용하던 모델과 동일하게 유지
                 "messages", messages,
                 "temperature", temperature
         );

@@ -39,19 +39,6 @@ public class BoardServiceImpl implements BoardService {
         }
     }
 
-//    private List<ImageRequest> uploadImages(List<MultipartFile> images) {
-//        List<ImageRequest> result = new ArrayList<>();
-//        for (MultipartFile file : images) {
-//            if (file.isEmpty()) continue;
-//            try {
-//                String key = r2Service.uploadImage(file, IMAGE_FOLDER);
-//                result.add(new ImageRequest(file.getOriginalFilename(), key));
-//            } catch (IOException e) {
-//                throw new RuntimeException("이미지 업로드 중 에러 발생", e);
-//            }
-//        }
-//        return result;
-//    }
     private List<ImageRequest> uploadImages(List<MultipartFile> images, Long boardId) {
         List<ImageRequest> uploaded = new ArrayList<>();
         for (MultipartFile file : images) {
