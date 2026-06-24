@@ -89,6 +89,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                 // b. 정보 정제 (Chainning)
                 contextInfo = infoFilterChain.filterContext(userMessage, searchResult);
                 log.info("[ChatbotService, Chain 2] Pinecone에서 조회한 데이터 중 중요한 것만 추출 완료");
+                log.info("[ChatbotService, Chain 2] 정제 이후 남은 정보: {}", contextInfo);
             } else {
                 log.info("[ChatbotService] 코스 관련 질문이 아니므로, 사용자 메시지 임베딩 생략");
             }
