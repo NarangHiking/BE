@@ -19,6 +19,27 @@
         select * from mountains
         where id = #{id}
     </select>
+    <!--추천 수 정렬-->
+    <select id="selectByRecommend">
+
+    </select>
+
+    <select id="selectTop8ByRecommend">
+        select m.*, IFNULL(rc.recommend_cnt, 0) as recommend_cnt
+        from mountains m
+        left join (
+            select t.mountain_id,
+                    COUNT(r.user_id) AS recommend_cnt
+            from tracks t
+            JOIN recommends r on r.track_id = t.id
+            group by t.mountain_id
+        ) rc on rc.mountain_id = m.id
+        order by recommend_Cnt DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
     <!-- 산 정보 삽입 -->
     <insert id="insert">
         insert into mountains (name, location, height, description, lat, lng, image_source, original_filename, stored_filename)

@@ -37,6 +37,13 @@ public class MtnController {
         return ResponseEntity.ok(ApiResult.success(mtns));
     }
 
+    @Operation(summary = "추천순 산 목록 조회", description = "코스 추천(하트) 수 기준 내림차순 정렬. limit 파라미터로 개수 제한 (미지정 시 전체)")
+    @GetMapping("/top")
+    public ResponseEntity<ApiResult> selectByRecommend(
+            @RequestParam(required = false) Integer limit) {
+        return ResponseEntity.ok(ApiResult.success(mtnService.selectByRecommend(limit)));
+    }
+
     @Operation(summary = "산 정보 개별 조회", description = "해당 산 ID의 정보를 불러옵니다..")
     @ApiResponses({
             @ApiResponse(responseCode="200", description="조회 성공"),

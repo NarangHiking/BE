@@ -17,4 +17,5 @@ public class Mtn {
     private String originalFilename;
     private String storedFilename;
     private String imageUrl; // 화면 표시용 R2 공개 URL (storedFilename으로부터 생성)
+    private Integer recommendCnt;
 }
