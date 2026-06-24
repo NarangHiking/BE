@@ -12,6 +12,8 @@ public interface MtnDao {
 
     List<Mtn> selectByName(String name);
 
+    List<Mtn> selectByRecommend(Integer limit);
+
     Mtn select(Long id);
 
     int insert(Mtn mtn);

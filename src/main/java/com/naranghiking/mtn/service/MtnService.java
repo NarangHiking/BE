@@ -15,4 +15,6 @@ public interface MtnService {
     int update(Mtn mtn);
 
     void delete(Long id);
+
+    List<Mtn> selectByRecommend(Integer limit);
 }
